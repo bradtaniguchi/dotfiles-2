@@ -1,0 +1,17 @@
+# dotfiles-2
+
+New repo to create new standardized development, based around modernized tooling and AI development.
+
+- native TS note CLI setup and installer scripts
+- helix instead of neovim
+- simplified and new theme of tmux
+- zoxide alias support
+- fzf alias support
+
+Targeting shells:
+- zshrc
+- bashrc
+
+## Main goals
+
+This purpose of this "new" version is mainly to simplify and improve my terminal workflow around some more modern tooling, specifically helix, which I've found to be **vastly** more user friendly and just as capable as neovim
