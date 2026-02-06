@@ -15,3 +15,29 @@ Targeting shells:
 ## Main goals
 
 This purpose of this "new" version is mainly to simplify and improve my terminal workflow around some more modern tooling, specifically helix, which I've found to be **vastly** more user friendly and just as capable as neovim
+
+## Local Development
+
+To use the CLI locally during development:
+
+```bash
+# Link the CLI globally (one-time setup)
+npm link
+
+# Now you can use the dotfiles command directly
+dotfiles <command> [options]
+dotfiles install --force
+dotfiles sync
+
+```
+
+### Check types without running
+npm run check-types
+
+### Lint and format code
+npm run lint
+npm run format
+
+### Unlink when done (optional)
+npm unlink -g dotfiles
+```

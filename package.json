@@ -1,12 +1,33 @@
 {
-  "name": "dotfiles-2",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+	"name": "dotfiles-2",
+	"version": "1.0.0",
+	"description": "CLI to manage dotfiles and system configurations",
+	"type": "module",
+	"main": "./cli/index.ts",
+	"bin": {
+		"dotfiles": "./cli/index.ts"
+	},
+	"scripts": {
+		"check-types": "tsc --noEmit",
+		"start": "node --experimental-strip-types ./cli/index.ts",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format --write .",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"dotfiles",
+		"cli",
+		"configuration"
+	],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.14",
+		"@types/node": "^25.2.0",
+		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"commander": "^14.0.3"
+	}
 }

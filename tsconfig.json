@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"target": "ES2022",
+		"lib": ["ES2022"],
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"resolveJsonModule": true,
+		"outDir": "./dist",
+		"rootDir": "./cli",
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"forceConsistentCasingInFileNames": true
+	},
+	"include": ["cli/**/*"],
+	"exclude": ["node_modules", "dist"]
+}
