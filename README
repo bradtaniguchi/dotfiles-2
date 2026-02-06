@@ -8,36 +8,28 @@ New repo to create new standardized development, based around modernized tooling
 - zoxide alias support
 - fzf alias support
 
-Targeting shells:
-- zshrc
-- bashrc
+Targets exclusively bash for simplicity
 
 ## Main goals
 
 This purpose of this "new" version is mainly to simplify and improve my terminal workflow around some more modern tooling, specifically helix, which I've found to be **vastly** more user friendly and just as capable as neovim
 
-## Local Development
+## Usage
 
-To use the CLI locally during development:
-
+This repo comes with a TS native node@24+ CLI that can be setup with
 ```bash
-# Link the CLI globally (one-time setup)
 npm link
-
-# Now you can use the dotfiles command directly
-dotfiles <command> [options]
-dotfiles install --force
-dotfiles sync
-
 ```
 
-### Check types without running
-npm run check-types
+use `npm unlink -g dotfiles` to deactivate this.
 
-### Lint and format code
-npm run lint
-npm run format
+use `dotfiles --help` to get help
 
-### Unlink when done (optional)
-npm unlink -g dotfiles
+## Environment pre-reqs
+
+Use the following to verify the environment
+```bash
+dotfiles verify
 ```
+
+To verify the current environment of all the neccessary installed tooling
