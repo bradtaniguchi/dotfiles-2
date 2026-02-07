@@ -49,7 +49,10 @@ alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
 alias more=less
-alias cd=z # always just use zoxide
+# alias cd=z # always just use zoxide
+
+# adanced aliases
+alias fh='hx $(fzf)'
 
 #############
 ## exports ##
