@@ -1,6 +1,6 @@
 {
 	"name": "dotfiles-2",
-	"version": "1.0.0",
+	"version": "0.0.0",
 	"description": "CLI to manage dotfiles and system configurations",
 	"type": "module",
 	"main": "./cli/index.ts",
