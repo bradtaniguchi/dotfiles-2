@@ -1,0 +1,70 @@
+# Theme based on tmux color75 (#5fafff)
+
+"ui.text" = "#e0e0e0"
+"ui.text.focus" = "#ffffff"
+"ui.cursor" = { fg = "#1a1a1a", bg = "#5fafff" }
+"ui.cursor.match" = { bg = "#3a3a3a", underline = { color = "#5fafff", style = "curl" } }
+"ui.selection" = { bg = "#2a4a5a" }
+"ui.linenr" = "#606060"
+"ui.linenr.selected" = "#5fafff"
+"ui.statusline" = { fg = "#000000", bg = "#5fafff" }
+"ui.statusline.inactive" = { fg = "#606060", bg = "#262626" }
+"ui.menu" = { fg = "#e0e0e0", bg = "#2a2a2a" }
+"ui.menu.selected" = { fg = "#ffffff", bg = "#5fafff" }
+"ui.popup" = { fg = "#e0e0e0", bg = "#2a2a2a" }
+"ui.window" = { fg = "#404040" }
+"ui.help" = { fg = "#e0e0e0", bg = "#2a2a2a" }
+
+"string" = "#5fafff"
+"constant" = "#8fafd7"
+"constant.numeric" = "#87d7ff"
+"constant.character.escape" = "#5fd7ff"
+
+"comment" = "#606060"
+"comment.documentation" = "#808080"
+
+"variable" = "#e0e0e0"
+"variable.parameter" = "#afd7ff"
+"variable.builtin" = "#87afff"
+
+"keyword" = "#5fafff"
+"keyword.control" = "#5fafff"
+"keyword.operator" = "#87d7ff"
+
+"function" = "#87d7ff"
+"function.builtin" = "#5fd7ff"
+"function.macro" = "#5fafff"
+
+"type" = "#87afff"
+"type.builtin" = "#5fafff"
+
+"constructor" = "#87d7ff"
+"operator" = "#87d7ff"
+
+"attribute" = "#afd7ff"
+"namespace" = "#87afff"
+"tag" = "#5fafff"
+
+"special" = "#5fd7ff"
+"markup.heading" = "#5fafff"
+"markup.list" = "#87d7ff"
+"markup.bold" = { fg = "#5fafff", modifiers = ["bold"] }
+"markup.italic" = { fg = "#87d7ff", modifiers = ["italic"] }
+"markup.link.url" = { fg = "#5fd7ff", underline = { style = "line" } }
+"markup.link.text" = "#87d7ff"
+"markup.quote" = "#afd7ff"
+"markup.raw" = "#5fafff"
+
+"diff.plus" = "#5fafff"
+"diff.delta" = "#87d7ff"
+"diff.minus" = "#af5f5f"
+
+"diagnostic.error" = { underline = { color = "#d75f5f", style = "curl" } }
+"diagnostic.warning" = { underline = { color = "#d7af5f", style = "curl" } }
+"diagnostic.info" = { underline = { color = "#5fafff", style = "curl" } }
+"diagnostic.hint" = { underline = { color = "#808080", style = "curl" } }
+
+"error" = "#d75f5f"
+"warning" = "#d7af5f"
+"info" = "#5fafff"
+"hint" = "#808080"
