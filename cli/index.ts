@@ -7,6 +7,7 @@ import { dirname, join } from "node:path";
 import { installCommand } from "./commands/install.ts";
 import { syncCommand } from "./commands/sync.ts";
 import { verifyCommand } from "./commands/verify.ts";
+import { backupCommand } from "./commands/backup.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,5 +26,6 @@ program
 program.addCommand(installCommand);
 program.addCommand(syncCommand);
 program.addCommand(verifyCommand);
+program.addCommand(backupCommand);
 
 program.parse();
