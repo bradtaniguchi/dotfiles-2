@@ -68,6 +68,12 @@ function verifyInstallations(): VerifyResult[] {
 		message: existsSync(zoxidePath) ? `Found at ${zoxidePath}` : "~/.local/bin/zoxide not found",
 	});
 
+	// Check starship
+	results.push({
+		name: "starship",
+		installed: checkCommand("starship"),
+	});
+
 	return results;
 }
 

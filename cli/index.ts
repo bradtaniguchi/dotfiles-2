@@ -1,4 +1,4 @@
-#!/usr/local/bin/node --experimental-strip-types
+#!/usr/bin/env node
 
 import { Command } from "commander";
 import { readFileSync } from "node:fs";
