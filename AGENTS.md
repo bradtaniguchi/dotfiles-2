@@ -4,3 +4,4 @@ This project is a CLI written in native typescript for node@24. The goal of the 
 
 Check the README.md for the different things controlled by this dotfile config
 
+After any changes to the source code use `npm run check-types`

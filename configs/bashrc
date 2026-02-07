@@ -49,6 +49,7 @@ alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
 alias more=less
+alias cd=z # always just use zoxide
 
 #############
 ## exports ##
@@ -58,6 +59,9 @@ export VISUAL='hx'
 export TERM=xterm-256color
 export COLORTERM=truecolor
 export GIT_EDITOR=hx
+
+# setup zoxide
+eval "$(zoxide init bash)"
 
 # use starship
 eval "$(starship init bash)"
