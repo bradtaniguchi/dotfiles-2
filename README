@@ -16,19 +16,37 @@ This purpose of this "new" version is mainly to simplify and improve my terminal
 
 ## Environment pre-reqs
 
-Use the following to verify the environment
+Use the following to verify the environment:
 ```bash
-dotfiles verify
+dotfiles verify        # Verify all tools
+dotfiles verify all    # Verify all tools (explicit)
+dotfiles verify helix  # Verify only Helix IDE (alias: hx)
+dotfiles verify tmux   # Verify only tmux
+dotfiles verify nvm    # Verify only nvm
+dotfiles verify fzf    # Verify only fzf
+dotfiles verify zoxide # Verify only zoxide
+dotfiles verify starship # Verify only starship
+dotfiles verify bashrc # Verify bashrc exists and matches configs/bashrc
+dotfiles verify gh     # Verify GitHub CLI (optional)
+dotfiles verify copilot # Verify GitHub Copilot CLI (optional)
+dotfiles verify htop   # Verify htop (optional)
 ```
 
 The verify command checks for the following:
 
+**Required Tools:**
 - **Helix IDE (hx)** - Modern terminal-based text editor
 - **tmux** - Terminal multiplexer
 - **nvm** - Node Version Manager (checks for ~/.nvm directory)
 - **fzf** - Fuzzy finder for command-line
 - **zoxide** - Smarter cd command (checks for ~/.local/bin/zoxide)
 - **starship** - Cross-shell prompt
+- **bashrc** - Bash configuration file (verifies existence and content match with configs/bashrc)
+
+**Optional/Recommended Tools:**
+- **gh** - GitHub CLI (recommended for GitHub Copilot integration)
+- **copilot** - GitHub Copilot CLI (AI-powered CLI assistance)
+- **htop** - Enhanced system monitoring tool
 
 ## Backing up
 

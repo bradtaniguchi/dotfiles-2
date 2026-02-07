@@ -1,13 +1,19 @@
 import { Command } from "commander";
 import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 interface VerifyResult {
 	name: string;
 	installed: boolean;
 	message?: string;
+	warning?: boolean;
+	optional?: boolean;
 }
 
 function checkCommand(command: string): boolean {
@@ -19,94 +25,301 @@ function checkCommand(command: string): boolean {
 	}
 }
 
-function checkAlias(alias: string, expectedCommand: string): boolean {
+// Individual verification functions
+function verifyHelix(): VerifyResult {
+	return {
+		name: "Helix IDE (hx)",
+		installed: checkCommand("hx"),
+	};
+}
+
+function verifyTmux(): VerifyResult {
+	return {
+		name: "tmux",
+		installed: checkCommand("tmux"),
+	};
+}
+
+function verifyNvm(): VerifyResult {
+	const nvmPath = join(homedir(), ".nvm");
+	return {
+		name: "nvm",
+		installed: existsSync(nvmPath),
+		message: existsSync(nvmPath) ? undefined : "~/.nvm not found",
+	};
+}
+
+function verifyFzf(): VerifyResult {
+	return {
+		name: "fzf",
+		installed: checkCommand("fzf"),
+	};
+}
+
+function verifyZoxide(): VerifyResult {
+	const zoxidePath = join(homedir(), ".local", "bin", "zoxide");
+	return {
+		name: "zoxide",
+		installed: existsSync(zoxidePath),
+		message: existsSync(zoxidePath)
+			? undefined
+			: "~/.local/bin/zoxide not found",
+	};
+}
+
+function verifyStarship(): VerifyResult {
+	return {
+		name: "starship",
+		installed: checkCommand("starship"),
+	};
+}
+
+function verifyBashrc(): VerifyResult {
+	const bashrcPath = join(homedir(), ".bashrc");
+	const configBashrcPath = join(__dirname, "../../configs/bashrc");
+
+	if (!existsSync(bashrcPath)) {
+		return {
+			name: "bashrc",
+			installed: false,
+			message: "~/.bashrc not found",
+		};
+	}
+
+	// Check if contents match
 	try {
-		const result = execSync(`bash -i -c "alias ${alias}"`, {
-			stdio: "pipe",
-			encoding: "utf-8",
-		});
-		return result.includes(expectedCommand);
-	} catch {
-		return false;
+		const installedContent = readFileSync(bashrcPath, "utf-8");
+		const configContent = readFileSync(configBashrcPath, "utf-8");
+
+		if (installedContent !== configContent) {
+			return {
+				name: "bashrc",
+				installed: true,
+				warning: true,
+				message:
+					"⚠️  ~/.bashrc exists but differs from configs/bashrc - may need sync",
+			};
+		}
+
+		return {
+			name: "bashrc",
+			installed: true,
+		};
+	} catch (error) {
+		return {
+			name: "bashrc",
+			installed: true,
+			warning: true,
+			message: `Error comparing bashrc: ${error instanceof Error ? error.message : String(error)}`,
+		};
 	}
 }
 
-function verifyInstallations(): VerifyResult[] {
-	const results: VerifyResult[] = [];
+// Optional/recommended tools
+function verifyGh(): VerifyResult {
+	const installed = checkCommand("gh");
+	return {
+		name: "gh (GitHub CLI)",
+		installed,
+		optional: true,
+		message: installed
+			? undefined
+			: "💡 Recommended: Install for GitHub Copilot integration",
+	};
+}
 
-	// Check Helix IDE
-	results.push({
-		name: "Helix IDE (hx)",
-		installed: checkCommand("hx"),
-	});
+function verifyGitHubCopilotCli(): VerifyResult {
+	const installed = checkCommand("copilot");
+	return {
+		name: "copilot (GitHub Copilot CLI)",
+		installed,
+		optional: true,
+		message: installed
+			? undefined
+			: "💡 Recommended: Install for AI-powered CLI assistance",
+	};
+}
 
-	// Check tmux
-	results.push({
-		name: "tmux",
-		installed: checkCommand("tmux"),
-	});
+function verifyHtop(): VerifyResult {
+	const installed = checkCommand("htop");
+	return {
+		name: "htop",
+		installed,
+		optional: true,
+		message: installed ? undefined : "💡 Recommended: Install for better system monitoring",
+	};
+}
 
-	// Check nvm (.nvm folder in home)
-	const nvmPath = join(homedir(), ".nvm");
-	results.push({
-		name: "nvm",
-		installed: existsSync(nvmPath),
-		message: existsSync(nvmPath) ? `Found at ${nvmPath}` : "~/.nvm not found",
-	});
+function verifyAll(): VerifyResult[] {
+	return [
+		verifyHelix(),
+		verifyTmux(),
+		verifyNvm(),
+		verifyFzf(),
+		verifyZoxide(),
+		verifyStarship(),
+		verifyBashrc(),
+		verifyGh(),
+		verifyGitHubCopilotCli(),
+		verifyHtop(),
+	];
+}
 
-	// Check fzf
-	results.push({
-		name: "fzf",
-		installed: checkCommand("fzf"),
-	});
+function displayResults(results: VerifyResult[]): void {
+	let allInstalled = true;
+	let hasWarnings = false;
 
-	// Check zoxide in ~/.local/bin
-	const zoxidePath = join(homedir(), ".local", "bin", "zoxide");
-	results.push({
-		name: "zoxide",
-		installed: existsSync(zoxidePath),
-		message: existsSync(zoxidePath) ? `Found at ${zoxidePath}` : "~/.local/bin/zoxide not found",
-	});
+	for (const result of results) {
+		// Optional tools don't affect overall status
+		if (result.optional && !result.installed) {
+			const color = "\x1b[36m"; // Cyan for optional
+			const reset = "\x1b[0m";
+			console.log(`${color}○${reset} ${result.name}`);
+			if (result.message) {
+				console.log(`  ${result.message}`);
+			}
+			continue;
+		}
 
-	// Check starship
-	results.push({
-		name: "starship",
-		installed: checkCommand("starship"),
-	});
+		const status = result.installed ? "✓" : "✗";
+		let color = result.installed ? "\x1b[32m" : "\x1b[31m";
 
-	return results;
+		// Use yellow for warnings
+		if (result.warning) {
+			color = "\x1b[33m";
+			hasWarnings = true;
+		}
+
+		const reset = "\x1b[0m";
+
+		console.log(`${color}${status}${reset} ${result.name}`);
+		if (result.message) {
+			console.log(`  ${result.message}`);
+		}
+
+		if (!result.installed && !result.optional) {
+			allInstalled = false;
+		}
+	}
+
+	console.log();
+	if (allInstalled && !hasWarnings) {
+		console.log("\x1b[32m✓ All configurations verified successfully!\x1b[0m");
+	} else if (allInstalled && hasWarnings) {
+		console.log(
+			"\x1b[33m⚠ All configurations installed but some have warnings.\x1b[0m",
+		);
+	} else {
+		console.log(
+			"\x1b[33m⚠ Some configurations are missing or not properly installed.\x1b[0m",
+		);
+		process.exit(1);
+	}
 }
 
 export const verifyCommand = new Command("verify")
 	.description("Verify configuration files are correctly installed")
 	.action(() => {
 		console.log("Verifying configurations...\n");
+		displayResults(verifyAll());
+	});
 
-		const results = verifyInstallations();
-		let allInstalled = true;
+// Subcommand: verify all
+verifyCommand
+	.command("all")
+	.description("Verify all configurations")
+	.action(() => {
+		console.log("Verifying all configurations...\n");
+		displayResults(verifyAll());
+	});
 
-		for (const result of results) {
-			const status = result.installed ? "✓" : "✗";
-			const color = result.installed ? "\x1b[32m" : "\x1b[31m";
-			const reset = "\x1b[0m";
+// Subcommand: verify helix
+verifyCommand
+	.command("helix")
+	.alias("hx")
+	.description("Verify Helix IDE installation")
+	.action(() => {
+		console.log("Verifying Helix IDE...\n");
+		displayResults([verifyHelix()]);
+	});
 
-			console.log(`${color}${status}${reset} ${result.name}`);
-			if (result.message) {
-				console.log(`  ${result.message}`);
-			}
+// Subcommand: verify tmux
+verifyCommand
+	.command("tmux")
+	.description("Verify tmux installation")
+	.action(() => {
+		console.log("Verifying tmux...\n");
+		displayResults([verifyTmux()]);
+	});
 
-			if (!result.installed) {
-				allInstalled = false;
-			}
-		}
+// Subcommand: verify nvm
+verifyCommand
+	.command("nvm")
+	.description("Verify nvm installation")
+	.action(() => {
+		console.log("Verifying nvm...\n");
+		displayResults([verifyNvm()]);
+	});
 
-		console.log();
-		if (allInstalled) {
-			console.log("\x1b[32m✓ All configurations verified successfully!\x1b[0m");
-		} else {
-			console.log(
-				"\x1b[33m⚠ Some configurations are missing or not properly installed.\x1b[0m",
-			);
-			process.exit(1);
-		}
+// Subcommand: verify fzf
+verifyCommand
+	.command("fzf")
+	.description("Verify fzf installation")
+	.action(() => {
+		console.log("Verifying fzf...\n");
+		displayResults([verifyFzf()]);
+	});
+
+// Subcommand: verify zoxide
+verifyCommand
+	.command("zoxide")
+	.description("Verify zoxide installation")
+	.action(() => {
+		console.log("Verifying zoxide...\n");
+		displayResults([verifyZoxide()]);
+	});
+
+// Subcommand: verify starship
+verifyCommand
+	.command("starship")
+	.description("Verify starship installation")
+	.action(() => {
+		console.log("Verifying starship...\n");
+		displayResults([verifyStarship()]);
+	});
+
+// Subcommand: verify bashrc
+verifyCommand
+	.command("bashrc")
+	.description("Verify bashrc installation and content")
+	.action(() => {
+		console.log("Verifying bashrc...\n");
+		displayResults([verifyBashrc()]);
+	});
+
+// Subcommand: verify gh
+verifyCommand
+	.command("gh")
+	.description("Verify GitHub CLI installation (optional)")
+	.action(() => {
+		console.log("Verifying GitHub CLI...\n");
+		displayResults([verifyGh()]);
+	});
+
+// Subcommand: verify copilot
+verifyCommand
+	.command("copilot")
+	.description("Verify GitHub Copilot CLI installation (optional)")
+	.action(() => {
+		console.log("Verifying GitHub Copilot CLI...\n");
+		displayResults([verifyGitHubCopilotCli()]);
+	});
+
+// Subcommand: verify htop
+verifyCommand
+	.command("htop")
+	.description("Verify htop installation (optional)")
+	.action(() => {
+		console.log("Verifying htop...\n");
+		displayResults([verifyHtop()]);
 	});
