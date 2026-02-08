@@ -36,3 +36,6 @@ render = true
 
 [editor.soft-wrap]
 enable = true
+
+[editor.statusline]
+left = ["mode", "spacer", "version-control", "spacer", "file-name"]
