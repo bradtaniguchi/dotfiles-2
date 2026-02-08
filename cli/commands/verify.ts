@@ -14,6 +14,7 @@ export interface VerifyResult {
 	message?: string;
 	warning?: boolean;
 	optional?: boolean;
+	installUrl?: string;
 }
 
 function checkCommand(command: string): boolean {
@@ -30,6 +31,7 @@ function verifyHelix(): VerifyResult {
 	return {
 		name: "Helix IDE (hx)",
 		installed: checkCommand("hx"),
+		installUrl: "https://docs.helix-editor.com/install.html",
 	};
 }
 
@@ -37,6 +39,7 @@ function verifyTmux(): VerifyResult {
 	return {
 		name: "tmux",
 		installed: checkCommand("tmux"),
+		installUrl: "https://github.com/tmux/tmux/wiki/Installing",
 	};
 }
 
@@ -46,6 +49,7 @@ function verifyNvm(): VerifyResult {
 		name: "nvm",
 		installed: existsSync(nvmPath),
 		message: existsSync(nvmPath) ? undefined : "~/.nvm not found",
+		installUrl: "https://github.com/nvm-sh/nvm#installing-and-updating",
 	};
 }
 
@@ -53,6 +57,7 @@ function verifyFzf(): VerifyResult {
 	return {
 		name: "fzf",
 		installed: checkCommand("fzf"),
+		installUrl: "https://github.com/junegunn/fzf#installation",
 	};
 }
 
@@ -64,6 +69,7 @@ function verifyZoxide(): VerifyResult {
 		message: existsSync(zoxidePath)
 			? undefined
 			: "~/.local/bin/zoxide not found",
+		installUrl: "https://github.com/ajeetdsouza/zoxide#installation",
 	};
 }
 
@@ -71,6 +77,7 @@ function verifyStarship(): VerifyResult {
 	return {
 		name: "starship",
 		installed: checkCommand("starship"),
+		installUrl: "https://starship.rs/guide/#-installation",
 	};
 }
 
@@ -159,6 +166,7 @@ function verifyGh(): VerifyResult {
 		message: installed
 			? undefined
 			: "💡 Recommended: Install for GitHub Copilot integration",
+		installUrl: "https://cli.github.com/manual/installation",
 	};
 }
 
@@ -171,6 +179,8 @@ function verifyGitHubCopilotCli(): VerifyResult {
 		message: installed
 			? undefined
 			: "💡 Recommended: Install for AI-powered CLI assistance",
+		installUrl:
+			"https://docs.github.com/en/copilot/how-tos/copilot-cli/install-copilot-cli",
 	};
 }
 
@@ -183,6 +193,7 @@ function verifyHtop(): VerifyResult {
 		message: installed
 			? undefined
 			: "💡 Recommended: Install for better system monitoring",
+		installUrl: "https://github.com/htop-dev/htop",
 	};
 }
 
@@ -214,6 +225,9 @@ function displayResults(results: VerifyResult[]): void {
 			if (result.message) {
 				console.log(`  ${result.message}`);
 			}
+			if (result.installUrl) {
+				console.log(`  📦 Install: ${result.installUrl}`);
+			}
 			continue;
 		}
 
@@ -231,6 +245,11 @@ function displayResults(results: VerifyResult[]): void {
 		console.log(`${color}${status}${reset} ${result.name}`);
 		if (result.message) {
 			console.log(`  ${result.message}`);
+		}
+
+		// Show install URL if not installed (and not a warning-only case)
+		if (!result.installed && result.installUrl) {
+			console.log(`  📦 Install: ${result.installUrl}`);
 		}
 
 		if (!result.installed && !result.optional) {
