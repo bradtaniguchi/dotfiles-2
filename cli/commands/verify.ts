@@ -162,6 +162,15 @@ function verifyGh(): VerifyResult {
 	};
 }
 
+function verifyHtop(): VerifyResult {
+	const installed = checkCommand("htop");
+	return {
+		name: "htop",
+		installed,
+		optional: true,
+		message: installed ? undefined : "💡 Recommended: Install for better system monitoring",
+	};
+}
 
 
 function verifyAll(): VerifyResult[] {
@@ -174,6 +183,7 @@ function verifyAll(): VerifyResult[] {
 		verifyStarship(),
 		verifyBashrc(),
 		verifyGh(),
+		verifyHtop(),
 	];
 }
 
@@ -316,6 +326,15 @@ verifyCommand
 	.action(() => {
 		console.log("Verifying GitHub CLI...\n");
 		displayResults([verifyGh()]);
+	});
+
+// Subcommand: verify htop
+verifyCommand
+	.command("htop")
+	.description("Verify htop installation (optional)")
+	.action(() => {
+		console.log("Verifying htop...\n");
+		displayResults([verifyHtop()]);
 	});
 
 // Export verification functions for use in other commands
