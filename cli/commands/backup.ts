@@ -1,8 +1,14 @@
-import { Command } from "commander";
-import { existsSync, mkdirSync, copyFileSync, readdirSync, statSync } from "node:fs";
+import {
+	copyFileSync,
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	statSync,
+} from "node:fs";
 import { homedir } from "node:os";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { Command } from "commander";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -120,7 +126,10 @@ function performBackup(items: BackupItem[]): BackupResult[] {
 	return results;
 }
 
-function displayBackupResults(results: BackupResult[], backupLocation: string): void {
+function displayBackupResults(
+	results: BackupResult[],
+	backupLocation: string,
+): void {
 	let backedUpCount = 0;
 	let skippedCount = 0;
 

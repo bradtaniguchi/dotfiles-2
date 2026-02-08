@@ -1,8 +1,8 @@
-import { Command } from "commander";
-import { copyFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { Command } from "commander";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -54,7 +54,7 @@ function syncHelix(dryrun = false): SyncResult {
 		if (!dryrun) {
 			copyDirectory(source, dest);
 		}
-		
+
 		return {
 			name: "helix",
 			success: true,
@@ -128,7 +128,7 @@ function syncBashrc(dryrun = false): SyncResult {
 			}
 			copyFileSync(source, dest);
 		}
-		
+
 		return {
 			name: "bashrc",
 			success: true,
@@ -176,16 +176,16 @@ function displayResults(results: SyncResult[], dryrun = false): void {
 	}
 }
 
-export const syncCommand = new Command("sync")
-	.description("Sync configuration files from system to repo");
+export const syncCommand = new Command("sync").description(
+	"Sync configuration files from system to repo",
+);
 
 // Default action when no subcommand is provided
-syncCommand
-	.action(() => {
-		// When no subcommand, show help or run all
-		console.log("Syncing all configurations from system to repo...\n");
-		displayResults(syncAll(false), false);
-	});
+syncCommand.action(() => {
+	// When no subcommand, show help or run all
+	console.log("Syncing all configurations from system to repo...\n");
+	displayResults(syncAll(false), false);
+});
 
 // Subcommand: sync all
 syncCommand
