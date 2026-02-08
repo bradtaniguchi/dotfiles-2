@@ -44,6 +44,14 @@ dotfiles sync bashrc -d    # Preview bashrc sync only
 
 ## Installing
 
+Install configuration files from your repo to the system:
+
 ```bash
-dotfiles install
+dotfiles install              # Install all configurations (with verification)
+# Dry run mode - see what would be installed without making changes
+dotfiles install --dryrun     # Preview all install operations
+dotfiles install --force      # Force overwrite existing files
+dotfiles install --no-verify  # Skip verification after installation
+dotfiles install bashrc -d    # Preview bashrc install only
 ```
+
