@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-interface VerifyResult {
+export interface VerifyResult {
 	name: string;
 	installed: boolean;
 	message?: string;
@@ -113,6 +113,40 @@ function verifyBashrc(): VerifyResult {
 			message: `Error comparing bashrc: ${error instanceof Error ? error.message : String(error)}`,
 		};
 	}
+}
+
+function verifyHelixConfig(): VerifyResult {
+	const helixConfigPath = join(homedir(), ".config", "helix");
+	
+	if (!existsSync(helixConfigPath)) {
+		return {
+			name: "helix",
+			installed: false,
+			message: "~/.config/helix not found",
+		};
+	}
+
+	return {
+		name: "helix",
+		installed: true,
+	};
+}
+
+function verifyTmuxConfig(): VerifyResult {
+	const tmuxConfigPath = join(homedir(), ".config", "tmux", "tmux.conf");
+	
+	if (!existsSync(tmuxConfigPath)) {
+		return {
+			name: "tmux",
+			installed: false,
+			message: "~/.config/tmux/tmux.conf not found",
+		};
+	}
+
+	return {
+		name: "tmux",
+		installed: true,
+	};
 }
 
 // Optional/recommended tools
@@ -323,3 +357,6 @@ verifyCommand
 		console.log("Verifying htop...\n");
 		displayResults([verifyHtop()]);
 	});
+
+// Export verification functions for use in other commands
+export { verifyHelixConfig, verifyTmuxConfig, verifyBashrc };
