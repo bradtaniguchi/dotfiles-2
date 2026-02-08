@@ -1,13 +1,13 @@
-import { Command } from "commander";
-import { copyFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { Command } from "commander";
 import {
 	type VerifyResult,
+	verifyBashrc,
 	verifyHelixConfig,
 	verifyTmuxConfig,
-	verifyBashrc,
 } from "./verify.ts";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -125,7 +125,8 @@ function installTmux(dryrun = false, force = false): InstallResult {
 				name: "tmux",
 				success: true,
 				skipped: true,
-				message: "~/.config/tmux/tmux.conf already exists (use --force to overwrite)",
+				message:
+					"~/.config/tmux/tmux.conf already exists (use --force to overwrite)",
 			};
 		}
 
@@ -202,7 +203,7 @@ function installAll(dryrun = false, force = false): InstallResult[] {
 
 function getVerifyResults(items: string[]): VerifyResult[] {
 	const results: VerifyResult[] = [];
-	
+
 	for (const item of items) {
 		switch (item) {
 			case "helix":
@@ -216,7 +217,7 @@ function getVerifyResults(items: string[]): VerifyResult[] {
 				break;
 		}
 	}
-	
+
 	return results;
 }
 
@@ -227,9 +228,9 @@ function displayResults(
 ): void {
 	// Run verification BEFORE installation if verify is enabled
 	if (verify) {
-		const itemsToVerify = results.map(r => r.name);
+		const itemsToVerify = results.map((r) => r.name);
 		const verifyResults = getVerifyResults(itemsToVerify);
-		
+
 		console.log("Current installation status:\n");
 		displayVerifyResults(verifyResults);
 	}
@@ -273,12 +274,16 @@ function displayResults(
 	}
 }
 
-export const installCommand = new Command("install")
-	.description("Install configuration files from repo to system");
+export const installCommand = new Command("install").description(
+	"Install configuration files from repo to system",
+);
 
 // Default action when no subcommand is provided
 installCommand
-	.option("-d, --dryrun", "Show what would be installed without actually installing")
+	.option(
+		"-d, --dryrun",
+		"Show what would be installed without actually installing",
+	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
 	.action((options) => {
@@ -295,7 +300,10 @@ installCommand
 installCommand
 	.command("all")
 	.description("Install all configurations")
-	.option("-d, --dryrun", "Show what would be installed without actually installing")
+	.option(
+		"-d, --dryrun",
+		"Show what would be installed without actually installing",
+	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
 	.action((...args) => {
@@ -304,7 +312,7 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
-		const verify = (options.verify !== false) && (parentOptions.verify !== false);
+		const verify = options.verify !== false && parentOptions.verify !== false;
 		console.log(
 			`Installing all configurations from repo to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
@@ -316,7 +324,10 @@ installCommand
 	.command("helix")
 	.alias("hx")
 	.description("Install Helix configuration")
-	.option("-d, --dryrun", "Show what would be installed without actually installing")
+	.option(
+		"-d, --dryrun",
+		"Show what would be installed without actually installing",
+	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
 	.action((...args) => {
@@ -325,7 +336,7 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
-		const verify = (options.verify !== false) && (parentOptions.verify !== false);
+		const verify = options.verify !== false && parentOptions.verify !== false;
 		console.log(
 			`Installing Helix configuration from repo to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
@@ -336,7 +347,10 @@ installCommand
 installCommand
 	.command("tmux")
 	.description("Install tmux configuration")
-	.option("-d, --dryrun", "Show what would be installed without actually installing")
+	.option(
+		"-d, --dryrun",
+		"Show what would be installed without actually installing",
+	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
 	.action((...args) => {
@@ -345,7 +359,7 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
-		const verify = (options.verify !== false) && (parentOptions.verify !== false);
+		const verify = options.verify !== false && parentOptions.verify !== false;
 		console.log(
 			`Installing tmux configuration from repo to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
@@ -356,7 +370,10 @@ installCommand
 installCommand
 	.command("bashrc")
 	.description("Install bashrc configuration")
-	.option("-d, --dryrun", "Show what would be installed without actually installing")
+	.option(
+		"-d, --dryrun",
+		"Show what would be installed without actually installing",
+	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
 	.action((...args) => {
@@ -365,7 +382,7 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
-		const verify = (options.verify !== false) && (parentOptions.verify !== false);
+		const verify = options.verify !== false && parentOptions.verify !== false;
 		console.log(
 			`Installing bashrc configuration from repo to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
