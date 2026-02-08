@@ -1,9 +1,9 @@
-import { Command } from "commander";
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { Command } from "commander";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -117,7 +117,7 @@ function verifyBashrc(): VerifyResult {
 
 function verifyHelixConfig(): VerifyResult {
 	const helixConfigPath = join(homedir(), ".config", "helix");
-	
+
 	if (!existsSync(helixConfigPath)) {
 		return {
 			name: "helix",
@@ -134,7 +134,7 @@ function verifyHelixConfig(): VerifyResult {
 
 function verifyTmuxConfig(): VerifyResult {
 	const tmuxConfigPath = join(homedir(), ".config", "tmux", "tmux.conf");
-	
+
 	if (!existsSync(tmuxConfigPath)) {
 		return {
 			name: "tmux",
@@ -180,7 +180,9 @@ function verifyHtop(): VerifyResult {
 		name: "htop",
 		installed,
 		optional: true,
-		message: installed ? undefined : "💡 Recommended: Install for better system monitoring",
+		message: installed
+			? undefined
+			: "💡 Recommended: Install for better system monitoring",
 	};
 }
 
@@ -325,6 +327,7 @@ verifyCommand
 // Subcommand: verify bashrc
 verifyCommand
 	.command("bashrc")
+	.alias("bash")
 	.description("Verify bashrc installation and content")
 	.action(() => {
 		console.log("Verifying bashrc...\n");

@@ -1,13 +1,13 @@
 #!/usr/bin/env -S node --experimental-strip-types
 
-import { Command } from "commander";
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { Command } from "commander";
+import { backupCommand } from "./commands/backup.ts";
 import { installCommand } from "./commands/install.ts";
 import { syncCommand } from "./commands/sync.ts";
 import { verifyCommand } from "./commands/verify.ts";
-import { backupCommand } from "./commands/backup.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
