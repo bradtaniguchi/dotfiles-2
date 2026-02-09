@@ -346,6 +346,7 @@ verifyCommand
 // Subcommand: verify bashrc
 verifyCommand
 	.command("bashrc")
+	.alias("bash")
 	.description("Verify bashrc installation and content")
 	.action(() => {
 		console.log("Verifying bashrc...\n");

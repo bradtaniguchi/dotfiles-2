@@ -246,6 +246,7 @@ backupCommand
 // Subcommand: backup bashrc
 backupCommand
 	.command("bashrc")
+	.alias("bash")
 	.description("Backup bashrc configuration")
 	.action(() => {
 		console.log("Creating bashrc backup...\n");

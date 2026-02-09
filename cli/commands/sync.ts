@@ -233,6 +233,7 @@ syncCommand
 // Subcommand: sync bashrc
 syncCommand
 	.command("bashrc")
+	.alias("bash")
 	.description("Sync bashrc configuration")
 	.option("-d, --dryrun", "Show what would be synced without actually syncing")
 	.action((_, cmd) => {

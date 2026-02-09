@@ -369,6 +369,7 @@ installCommand
 // Subcommand: install bashrc
 installCommand
 	.command("bashrc")
+	.alias("bash")
 	.description("Install bashrc configuration")
 	.option(
 		"-d, --dryrun",
