@@ -170,20 +170,6 @@ function verifyGh(): VerifyResult {
 	};
 }
 
-function verifyGitHubCopilotCli(): VerifyResult {
-	const installed = checkCommand("copilot");
-	return {
-		name: "copilot (GitHub Copilot CLI)",
-		installed,
-		optional: true,
-		message: installed
-			? undefined
-			: "💡 Recommended: Install for AI-powered CLI assistance",
-		installUrl:
-			"https://docs.github.com/en/copilot/how-tos/copilot-cli/install-copilot-cli",
-	};
-}
-
 function verifyHtop(): VerifyResult {
 	const installed = checkCommand("htop");
 	return {
@@ -207,7 +193,6 @@ function verifyAll(): VerifyResult[] {
 		verifyStarship(),
 		verifyBashrc(),
 		verifyGh(),
-		verifyGitHubCopilotCli(),
 		verifyHtop(),
 	];
 }
@@ -360,15 +345,6 @@ verifyCommand
 	.action(() => {
 		console.log("Verifying GitHub CLI...\n");
 		displayResults([verifyGh()]);
-	});
-
-// Subcommand: verify copilot
-verifyCommand
-	.command("copilot")
-	.description("Verify GitHub Copilot CLI installation (optional)")
-	.action(() => {
-		console.log("Verifying GitHub Copilot CLI...\n");
-		displayResults([verifyGitHubCopilotCli()]);
 	});
 
 // Subcommand: verify htop
