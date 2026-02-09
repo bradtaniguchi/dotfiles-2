@@ -64,13 +64,13 @@ export COLORTERM=truecolor
 export GIT_EDITOR=hx
 
 # setup fzf
-#[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-# setup zoxide
-eval "$(zoxide init bash)"
+# setup zoxide 
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init bash)"
+fi
 
 # use starship
 eval "$(starship init bash)"
 
-
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
