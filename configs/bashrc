@@ -64,6 +64,9 @@ export COLORTERM=truecolor
 export GIT_EDITOR=hx
 
 # setup fzf
+# Change the default file-finding command to exclude node_modules and other common directories
+export FZF_DEFAULT_COMMAND="find . -type d \( -name node_modules -o -name .git \) -prune -o -type f -print 2>/dev/null"
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # setup zoxide 
