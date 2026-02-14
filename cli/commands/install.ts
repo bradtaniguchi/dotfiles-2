@@ -65,10 +65,16 @@ function displayVerifyResults(results: VerifyResult[]): void {
 	console.log();
 }
 
-function installHelix(dryrun = false, force = false, from?: string): InstallResult {
+function installHelix(
+	dryrun = false,
+	force = false,
+	from?: string,
+): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
-		const sourceBase = from ? join(repoRoot, "backups", from) : join(repoRoot, "configs");
+		const sourceBase = from
+			? join(repoRoot, "backups", from)
+			: join(repoRoot, "configs");
 		const source = join(sourceBase, "helix");
 		const dest = join(homedir(), ".config", "helix");
 
@@ -76,7 +82,9 @@ function installHelix(dryrun = false, force = false, from?: string): InstallResu
 			return {
 				name: "helix",
 				success: false,
-				message: from ? `backups/${from}/helix not found` : "configs/helix not found in repo",
+				message: from
+					? `backups/${from}/helix not found`
+					: "configs/helix not found in repo",
 			};
 		}
 
@@ -107,10 +115,16 @@ function installHelix(dryrun = false, force = false, from?: string): InstallResu
 	}
 }
 
-function installTmux(dryrun = false, force = false, from?: string): InstallResult {
+function installTmux(
+	dryrun = false,
+	force = false,
+	from?: string,
+): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
-		const sourceBase = from ? join(repoRoot, "backups", from) : join(repoRoot, "configs");
+		const sourceBase = from
+			? join(repoRoot, "backups", from)
+			: join(repoRoot, "configs");
 		const source = join(sourceBase, "tmux/tmux.conf");
 		const dest = join(homedir(), ".config", "tmux", "tmux.conf");
 
@@ -118,7 +132,9 @@ function installTmux(dryrun = false, force = false, from?: string): InstallResul
 			return {
 				name: "tmux",
 				success: false,
-				message: from ? `backups/${from}/tmux/tmux.conf not found` : "configs/tmux/tmux.conf not found in repo",
+				message: from
+					? `backups/${from}/tmux/tmux.conf not found`
+					: "configs/tmux/tmux.conf not found in repo",
 			};
 		}
 
@@ -154,10 +170,16 @@ function installTmux(dryrun = false, force = false, from?: string): InstallResul
 	}
 }
 
-function installBashrc(dryrun = false, force = false, from?: string): InstallResult {
+function installBashrc(
+	dryrun = false,
+	force = false,
+	from?: string,
+): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
-		const sourceBase = from ? join(repoRoot, "backups", from) : join(repoRoot, "configs");
+		const sourceBase = from
+			? join(repoRoot, "backups", from)
+			: join(repoRoot, "configs");
 		const source = join(sourceBase, "bashrc");
 		const dest = join(homedir(), ".bashrc");
 
@@ -165,7 +187,9 @@ function installBashrc(dryrun = false, force = false, from?: string): InstallRes
 			return {
 				name: "bashrc",
 				success: false,
-				message: from ? `backups/${from}/bashrc not found` : "configs/bashrc not found in repo",
+				message: from
+					? `backups/${from}/bashrc not found`
+					: "configs/bashrc not found in repo",
 			};
 		}
 
@@ -196,7 +220,11 @@ function installBashrc(dryrun = false, force = false, from?: string): InstallRes
 	}
 }
 
-function installAll(dryrun = false, force = false, from?: string): InstallResult[] {
+function installAll(
+	dryrun = false,
+	force = false,
+	from?: string,
+): InstallResult[] {
 	return [
 		installHelix(dryrun, force, from),
 		installTmux(dryrun, force, from),
@@ -289,7 +317,10 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
-	.option("--from <backup>", "Install from a specific backup (e.g., 2024-01-15)")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
 	.action((options) => {
 		const dryrun = options.dryrun || false;
 		const force = options.force || false;
@@ -312,7 +343,10 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
-	.option("--from <backup>", "Install from a specific backup (e.g., 2024-01-15)")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
 	.action((...args) => {
 		const cmd = args[args.length - 1];
 		const options = cmd.opts();
@@ -339,7 +373,10 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
-	.option("--from <backup>", "Install from a specific backup (e.g., 2024-01-15)")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
 	.action((...args) => {
 		const cmd = args[args.length - 1];
 		const options = cmd.opts();
@@ -365,7 +402,10 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
-	.option("--from <backup>", "Install from a specific backup (e.g., 2024-01-15)")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
 	.action((...args) => {
 		const cmd = args[args.length - 1];
 		const options = cmd.opts();
@@ -392,7 +432,10 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
-	.option("--from <backup>", "Install from a specific backup (e.g., 2024-01-15)")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
 	.action((...args) => {
 		const cmd = args[args.length - 1];
 		const options = cmd.opts();
