@@ -53,5 +53,7 @@ dotfiles install --dryrun     # Preview all install operations
 dotfiles install --force      # Force overwrite existing files
 dotfiles install --no-verify  # Skip verification after installation
 dotfiles install bashrc -d    # Preview bashrc install only
+# Install from a specific backup
+dotfiles install --from 2024-01-15  # Install from backup dated 2024-01-15
 ```
 
