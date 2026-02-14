@@ -53,6 +53,7 @@ alias more=less
 
 # advanced aliases
 # helix + fzf aliases - only add if both are installed
+# both hf and fh provided for convenience (either order works)
 if command -v hx &> /dev/null && command -v fzf &> /dev/null; then
     alias hf='hx $(fzf)'
     alias fh='hx $(fzf)'
