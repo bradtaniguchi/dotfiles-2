@@ -51,8 +51,12 @@ alias np='nano -w PKGBUILD'
 alias more=less
 # alias cd=z # always just use zoxide
 
-# adanced aliases
-# alias fh='hx $(fzf)'
+# advanced aliases
+# helix + fzf aliases - only add if both are installed
+if command -v hx &> /dev/null && command -v fzf &> /dev/null; then
+    alias hf='hx $(fzf)'
+    alias fh='hx $(fzf)'
+fi
 
 #############
 ## exports ##
