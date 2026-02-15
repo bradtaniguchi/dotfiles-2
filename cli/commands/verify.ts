@@ -245,6 +245,14 @@ function displayResults(results: VerifyResult[], showDiff = false): void {
 	}
 
 	console.log();
+	
+	// Show diff if requested (before potential exit)
+	if (showDiff) {
+		console.log("\nShowing differences:\n");
+		showConfigDiffs();
+		console.log();
+	}
+	
 	if (allInstalled && !hasWarnings) {
 		console.log("\x1b[32m✓ All configurations verified successfully!\x1b[0m");
 	} else if (allInstalled && hasWarnings) {
@@ -256,12 +264,6 @@ function displayResults(results: VerifyResult[], showDiff = false): void {
 			"\x1b[33m⚠ Some configurations are missing or not properly installed.\x1b[0m",
 		);
 		process.exit(1);
-	}
-
-	// Show diff if requested
-	if (showDiff) {
-		console.log("\nShowing differences:\n");
-		showConfigDiffs();
 	}
 }
 
