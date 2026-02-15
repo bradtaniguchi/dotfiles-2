@@ -253,12 +253,19 @@ function getVerifyResults(items: string[]): VerifyResult[] {
 	return results;
 }
 
-function displayResults(
-	results: InstallResult[],
+interface DisplayResultsOptions {
+	results: InstallResult[];
+	dryrun?: boolean;
+	verify?: boolean;
+	showDiff?: boolean;
+}
+
+function displayResults({
+	results,
 	dryrun = false,
 	verify = true,
 	showDiff = false,
-): void {
+}: DisplayResultsOptions): void {
 	// Show diff BEFORE installation if requested
 	if (showDiff) {
 		console.log("Showing differences before installation:\n");
@@ -341,7 +348,12 @@ installCommand
 		console.log(
 			`Installing all configurations from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults(installAll(dryrun, force, from), dryrun, verify, showDiff);
+		displayResults({
+			results: installAll(dryrun, force, from),
+			dryrun,
+			verify,
+			showDiff,
+		});
 	});
 
 // Subcommand: install all
@@ -372,7 +384,12 @@ installCommand
 		console.log(
 			`Installing all configurations from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults(installAll(dryrun, force, from), dryrun, verify, showDiff);
+		displayResults({
+			results: installAll(dryrun, force, from),
+			dryrun,
+			verify,
+			showDiff,
+		});
 	});
 
 // Subcommand: install helix
@@ -404,7 +421,12 @@ installCommand
 		console.log(
 			`Installing Helix configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([installHelix(dryrun, force, from)], dryrun, verify, showDiff);
+		displayResults({
+			results: [installHelix(dryrun, force, from)],
+			dryrun,
+			verify,
+			showDiff,
+		});
 	});
 
 // Subcommand: install tmux
@@ -435,7 +457,12 @@ installCommand
 		console.log(
 			`Installing tmux configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([installTmux(dryrun, force, from)], dryrun, verify, showDiff);
+		displayResults({
+			results: [installTmux(dryrun, force, from)],
+			dryrun,
+			verify,
+			showDiff,
+		});
 	});
 
 // Subcommand: install bashrc
@@ -467,5 +494,10 @@ installCommand
 		console.log(
 			`Installing bashrc configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([installBashrc(dryrun, force, from)], dryrun, verify, showDiff);
+		displayResults({
+			results: [installBashrc(dryrun, force, from)],
+			dryrun,
+			verify,
+			showDiff,
+		});
 	});

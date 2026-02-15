@@ -198,7 +198,15 @@ function verifyAll(): VerifyResult[] {
 	];
 }
 
-function displayResults(results: VerifyResult[], showDiff = false): void {
+interface DisplayResultsOptions {
+	results: VerifyResult[];
+	showDiff?: boolean;
+}
+
+function displayResults({
+	results,
+	showDiff = false,
+}: DisplayResultsOptions): void {
 	let allInstalled = true;
 	let hasWarnings = false;
 
@@ -271,7 +279,10 @@ export const verifyCommand = new Command("verify")
 	.option("--diff", "Show differences between repo and installed configs")
 	.action((options) => {
 		console.log("Verifying configurations...\n");
-		displayResults(verifyAll(), options.diff);
+		displayResults({
+			results: verifyAll(),
+			showDiff: options.diff,
+		});
 	});
 
 // Subcommand: verify all
@@ -285,7 +296,10 @@ verifyCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const showDiff = options.diff || parentOptions.diff || false;
 		console.log("Verifying all configurations...\n");
-		displayResults(verifyAll(), showDiff);
+		displayResults({
+			results: verifyAll(),
+			showDiff,
+		});
 	});
 
 // Subcommand: verify helix
@@ -295,7 +309,7 @@ verifyCommand
 	.description("Verify Helix IDE installation")
 	.action(() => {
 		console.log("Verifying Helix IDE...\n");
-		displayResults([verifyHelix()]);
+		displayResults({ results: [verifyHelix()] });
 	});
 
 // Subcommand: verify tmux
@@ -304,7 +318,7 @@ verifyCommand
 	.description("Verify tmux installation")
 	.action(() => {
 		console.log("Verifying tmux...\n");
-		displayResults([verifyTmux()]);
+		displayResults({ results: [verifyTmux()] });
 	});
 
 // Subcommand: verify nvm
@@ -313,7 +327,7 @@ verifyCommand
 	.description("Verify nvm installation")
 	.action(() => {
 		console.log("Verifying nvm...\n");
-		displayResults([verifyNvm()]);
+		displayResults({ results: [verifyNvm()] });
 	});
 
 // Subcommand: verify fzf
@@ -322,7 +336,7 @@ verifyCommand
 	.description("Verify fzf installation")
 	.action(() => {
 		console.log("Verifying fzf...\n");
-		displayResults([verifyFzf()]);
+		displayResults({ results: [verifyFzf()] });
 	});
 
 // Subcommand: verify zoxide
@@ -331,7 +345,7 @@ verifyCommand
 	.description("Verify zoxide installation")
 	.action(() => {
 		console.log("Verifying zoxide...\n");
-		displayResults([verifyZoxide()]);
+		displayResults({ results: [verifyZoxide()] });
 	});
 
 // Subcommand: verify starship
@@ -340,7 +354,7 @@ verifyCommand
 	.description("Verify starship installation")
 	.action(() => {
 		console.log("Verifying starship...\n");
-		displayResults([verifyStarship()]);
+		displayResults({ results: [verifyStarship()] });
 	});
 
 // Subcommand: verify bashrc
@@ -355,7 +369,10 @@ verifyCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const showDiff = options.diff || parentOptions.diff || false;
 		console.log("Verifying bashrc...\n");
-		displayResults([verifyBashrc()], showDiff);
+		displayResults({
+			results: [verifyBashrc()],
+			showDiff,
+		});
 	});
 
 // Subcommand: verify gh
@@ -364,7 +381,7 @@ verifyCommand
 	.description("Verify GitHub CLI installation (optional)")
 	.action(() => {
 		console.log("Verifying GitHub CLI...\n");
-		displayResults([verifyGh()]);
+		displayResults({ results: [verifyGh()] });
 	});
 
 // Subcommand: verify htop
@@ -373,7 +390,7 @@ verifyCommand
 	.description("Verify htop installation (optional)")
 	.action(() => {
 		console.log("Verifying htop...\n");
-		displayResults([verifyHtop()]);
+		displayResults({ results: [verifyHtop()] });
 	});
 
 // Export verification functions for use in other commands
