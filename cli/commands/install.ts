@@ -10,7 +10,7 @@ import {
 	verifyTmuxConfig,
 } from "./verify.ts";
 import { compareFiles, compareDirectories } from "../utils/diff.ts";
-import { displayDiff } from "../utils/diff-renderer.tsx";
+import { displayDiff } from "../utils/diff-renderer.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

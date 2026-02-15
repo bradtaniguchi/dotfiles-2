@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { compareFiles, compareDirectories } from "../utils/diff.ts";
-import { displayDiff } from "../utils/diff-renderer.tsx";
+import { displayDiff } from "../utils/diff-renderer.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -309,9 +309,13 @@ verifyCommand
 	.command("all")
 	.description("Verify all configurations")
 	.option("--diff", "Show differences between repo and installed configs")
-	.action((options) => {
+	.action((...args) => {
+		const cmd = args[args.length - 1];
+		const options = cmd.opts();
+		const parentOptions = cmd.parent?.opts() || {};
+		const showDiff = options.diff || parentOptions.diff || false;
 		console.log("Verifying all configurations...\n");
-		displayResults(verifyAll(), options.diff);
+		displayResults(verifyAll(), showDiff);
 	});
 
 // Subcommand: verify helix
@@ -375,9 +379,13 @@ verifyCommand
 	.alias("bash")
 	.description("Verify bashrc installation and content")
 	.option("--diff", "Show differences between repo and installed configs")
-	.action((options) => {
+	.action((...args) => {
+		const cmd = args[args.length - 1];
+		const options = cmd.opts();
+		const parentOptions = cmd.parent?.opts() || {};
+		const showDiff = options.diff || parentOptions.diff || false;
 		console.log("Verifying bashrc...\n");
-		displayResults([verifyBashrc()], options.diff);
+		displayResults([verifyBashrc()], showDiff);
 	});
 
 // Subcommand: verify gh
