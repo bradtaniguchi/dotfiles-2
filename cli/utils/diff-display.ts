@@ -74,4 +74,3 @@ function displayFileDiff(diff: FileDiff): void {
 
 	console.log();
 }
-

@@ -4,8 +4,7 @@ import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
-import { compareFiles, compareDirectories } from "../utils/diff.ts";
-import { displayDiff } from "../utils/diff-renderer.ts";
+import { showConfigDiffs } from "../utils/show-config-diffs.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -245,14 +244,14 @@ function displayResults(results: VerifyResult[], showDiff = false): void {
 	}
 
 	console.log();
-	
+
 	// Show diff if requested (before potential exit)
 	if (showDiff) {
 		console.log("\nShowing differences:\n");
 		showConfigDiffs();
 		console.log();
 	}
-	
+
 	if (allInstalled && !hasWarnings) {
 		console.log("\x1b[32m✓ All configurations verified successfully!\x1b[0m");
 	} else if (allInstalled && hasWarnings) {
@@ -265,37 +264,6 @@ function displayResults(results: VerifyResult[], showDiff = false): void {
 		);
 		process.exit(1);
 	}
-}
-
-function showConfigDiffs(): void {
-	const allDiffs = [];
-
-	// Compare bashrc
-	const bashrcDiff = compareFiles(
-		join(__dirname, "../../configs/bashrc"),
-		join(homedir(), ".bashrc"),
-	);
-	if (bashrcDiff) {
-		allDiffs.push(bashrcDiff);
-	}
-
-	// Compare helix config
-	const helixDiffs = compareDirectories(
-		join(__dirname, "../../configs/helix"),
-		join(homedir(), ".config", "helix"),
-	);
-	allDiffs.push(...helixDiffs);
-
-	// Compare tmux config
-	const tmuxDiff = compareFiles(
-		join(__dirname, "../../configs/tmux/tmux.conf"),
-		join(homedir(), ".config", "tmux", "tmux.conf"),
-	);
-	if (tmuxDiff) {
-		allDiffs.push(tmuxDiff);
-	}
-
-	displayDiff(allDiffs);
 }
 
 export const verifyCommand = new Command("verify")
