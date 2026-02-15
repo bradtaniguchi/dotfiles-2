@@ -176,15 +176,18 @@ function displayResults(results: SyncResult[], dryrun = false): void {
 	}
 }
 
-export const syncCommand = new Command("sync").description(
-	"Sync configuration files from system to repo",
-);
+export const syncCommand = new Command("sync")
+	.description("Sync configuration files from system to repo")
+	.option("-d, --dryrun", "Show what would be synced without actually syncing");
 
 // Default action when no subcommand is provided
-syncCommand.action(() => {
+syncCommand.action((options) => {
 	// When no subcommand, show help or run all
-	console.log("Syncing all configurations from system to repo...\n");
-	displayResults(syncAll(false), false);
+	const dryrun = options.dryrun || false;
+	console.log(
+		`Syncing all configurations from system to repo${dryrun ? " (dry run)" : ""}...\n`,
+	);
+	displayResults(syncAll(dryrun), dryrun);
 });
 
 // Subcommand: sync all
@@ -194,7 +197,8 @@ syncCommand
 	.option("-d, --dryrun", "Show what would be synced without actually syncing")
 	.action((_, cmd) => {
 		const options = cmd.opts();
-		const dryrun = options.dryrun || false;
+		const parentOptions = cmd.parent?.opts() || {};
+		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		console.log(
 			`Syncing all configurations from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 		);
@@ -209,7 +213,8 @@ syncCommand
 	.option("-d, --dryrun", "Show what would be synced without actually syncing")
 	.action((_, cmd) => {
 		const options = cmd.opts();
-		const dryrun = options.dryrun || false;
+		const parentOptions = cmd.parent?.opts() || {};
+		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		console.log(
 			`Syncing Helix configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 		);
@@ -223,7 +228,8 @@ syncCommand
 	.option("-d, --dryrun", "Show what would be synced without actually syncing")
 	.action((_, cmd) => {
 		const options = cmd.opts();
-		const dryrun = options.dryrun || false;
+		const parentOptions = cmd.parent?.opts() || {};
+		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		console.log(
 			`Syncing tmux configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 		);
@@ -238,7 +244,8 @@ syncCommand
 	.option("-d, --dryrun", "Show what would be synced without actually syncing")
 	.action((_, cmd) => {
 		const options = cmd.opts();
-		const dryrun = options.dryrun || false;
+		const parentOptions = cmd.parent?.opts() || {};
+		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		console.log(
 			`Syncing bashrc configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 		);
