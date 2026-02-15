@@ -65,17 +65,26 @@ function displayVerifyResults(results: VerifyResult[]): void {
 	console.log();
 }
 
-function installHelix(dryrun = false, force = false): InstallResult {
+function installHelix(
+	dryrun = false,
+	force = false,
+	from?: string,
+): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
-		const source = join(repoRoot, "configs/helix");
+		const sourceBase = from
+			? join(repoRoot, "backups", from)
+			: join(repoRoot, "configs");
+		const source = join(sourceBase, "helix");
 		const dest = join(homedir(), ".config", "helix");
 
 		if (!existsSync(source)) {
 			return {
 				name: "helix",
 				success: false,
-				message: "configs/helix not found in repo",
+				message: from
+					? `backups/${from}/helix not found`
+					: "configs/helix not found in repo",
 			};
 		}
 
@@ -106,17 +115,26 @@ function installHelix(dryrun = false, force = false): InstallResult {
 	}
 }
 
-function installTmux(dryrun = false, force = false): InstallResult {
+function installTmux(
+	dryrun = false,
+	force = false,
+	from?: string,
+): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
-		const source = join(repoRoot, "configs/tmux/tmux.conf");
+		const sourceBase = from
+			? join(repoRoot, "backups", from)
+			: join(repoRoot, "configs");
+		const source = join(sourceBase, "tmux/tmux.conf");
 		const dest = join(homedir(), ".config", "tmux", "tmux.conf");
 
 		if (!existsSync(source)) {
 			return {
 				name: "tmux",
 				success: false,
-				message: "configs/tmux/tmux.conf not found in repo",
+				message: from
+					? `backups/${from}/tmux/tmux.conf not found`
+					: "configs/tmux/tmux.conf not found in repo",
 			};
 		}
 
@@ -152,17 +170,26 @@ function installTmux(dryrun = false, force = false): InstallResult {
 	}
 }
 
-function installBashrc(dryrun = false, force = false): InstallResult {
+function installBashrc(
+	dryrun = false,
+	force = false,
+	from?: string,
+): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
-		const source = join(repoRoot, "configs/bashrc");
+		const sourceBase = from
+			? join(repoRoot, "backups", from)
+			: join(repoRoot, "configs");
+		const source = join(sourceBase, "bashrc");
 		const dest = join(homedir(), ".bashrc");
 
 		if (!existsSync(source)) {
 			return {
 				name: "bashrc",
 				success: false,
-				message: "configs/bashrc not found in repo",
+				message: from
+					? `backups/${from}/bashrc not found`
+					: "configs/bashrc not found in repo",
 			};
 		}
 
@@ -193,11 +220,15 @@ function installBashrc(dryrun = false, force = false): InstallResult {
 	}
 }
 
-function installAll(dryrun = false, force = false): InstallResult[] {
+function installAll(
+	dryrun = false,
+	force = false,
+	from?: string,
+): InstallResult[] {
 	return [
-		installHelix(dryrun, force),
-		installTmux(dryrun, force),
-		installBashrc(dryrun, force),
+		installHelix(dryrun, force, from),
+		installTmux(dryrun, force, from),
+		installBashrc(dryrun, force, from),
 	];
 }
 
@@ -286,14 +317,20 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
 	.action((options) => {
 		const dryrun = options.dryrun || false;
 		const force = options.force || false;
 		const verify = options.verify !== false;
+		const from = options.from;
+		const sourceDesc = from ? `backup (${from})` : "repo";
 		console.log(
-			`Installing all configurations from repo to system${dryrun ? " (dry run)" : ""}...\n`,
+			`Installing all configurations from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults(installAll(dryrun, force), dryrun, verify);
+		displayResults(installAll(dryrun, force, from), dryrun, verify);
 	});
 
 // Subcommand: install all
@@ -306,6 +343,10 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
 	.action((...args) => {
 		const cmd = args[args.length - 1];
 		const options = cmd.opts();
@@ -313,10 +354,12 @@ installCommand
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
+		const from = options.from || parentOptions.from;
+		const sourceDesc = from ? `backup (${from})` : "repo";
 		console.log(
-			`Installing all configurations from repo to system${dryrun ? " (dry run)" : ""}...\n`,
+			`Installing all configurations from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults(installAll(dryrun, force), dryrun, verify);
+		displayResults(installAll(dryrun, force, from), dryrun, verify);
 	});
 
 // Subcommand: install helix
@@ -330,6 +373,10 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
 	.action((...args) => {
 		const cmd = args[args.length - 1];
 		const options = cmd.opts();
@@ -337,10 +384,12 @@ installCommand
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
+		const from = options.from || parentOptions.from;
+		const sourceDesc = from ? `backup (${from})` : "repo";
 		console.log(
-			`Installing Helix configuration from repo to system${dryrun ? " (dry run)" : ""}...\n`,
+			`Installing Helix configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([installHelix(dryrun, force)], dryrun, verify);
+		displayResults([installHelix(dryrun, force, from)], dryrun, verify);
 	});
 
 // Subcommand: install tmux
@@ -353,6 +402,10 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
 	.action((...args) => {
 		const cmd = args[args.length - 1];
 		const options = cmd.opts();
@@ -360,10 +413,12 @@ installCommand
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
+		const from = options.from || parentOptions.from;
+		const sourceDesc = from ? `backup (${from})` : "repo";
 		console.log(
-			`Installing tmux configuration from repo to system${dryrun ? " (dry run)" : ""}...\n`,
+			`Installing tmux configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([installTmux(dryrun, force)], dryrun, verify);
+		displayResults([installTmux(dryrun, force, from)], dryrun, verify);
 	});
 
 // Subcommand: install bashrc
@@ -377,6 +432,10 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
 	.action((...args) => {
 		const cmd = args[args.length - 1];
 		const options = cmd.opts();
@@ -384,8 +443,10 @@ installCommand
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
+		const from = options.from || parentOptions.from;
+		const sourceDesc = from ? `backup (${from})` : "repo";
 		console.log(
-			`Installing bashrc configuration from repo to system${dryrun ? " (dry run)" : ""}...\n`,
+			`Installing bashrc configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([installBashrc(dryrun, force)], dryrun, verify);
+		displayResults([installBashrc(dryrun, force, from)], dryrun, verify);
 	});
