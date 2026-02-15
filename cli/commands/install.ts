@@ -9,6 +9,8 @@ import {
 	verifyHelixConfig,
 	verifyTmuxConfig,
 } from "./verify.ts";
+import { compareFiles, compareDirectories } from "../utils/diff.ts";
+import { displayDiff } from "../utils/diff-renderer.tsx";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -256,7 +258,15 @@ function displayResults(
 	results: InstallResult[],
 	dryrun = false,
 	verify = true,
+	showDiff = false,
 ): void {
+	// Show diff BEFORE installation if requested
+	if (showDiff) {
+		console.log("Showing differences before installation:\n");
+		showConfigDiffs();
+		console.log();
+	}
+
 	// Run verification BEFORE installation if verify is enabled
 	if (verify) {
 		const itemsToVerify = results.map((r) => r.name);
@@ -305,6 +315,37 @@ function displayResults(
 	}
 }
 
+function showConfigDiffs(): void {
+	const allDiffs = [];
+
+	// Compare bashrc
+	const bashrcDiff = compareFiles(
+		join(__dirname, "../../configs/bashrc"),
+		join(homedir(), ".bashrc"),
+	);
+	if (bashrcDiff) {
+		allDiffs.push(bashrcDiff);
+	}
+
+	// Compare helix config
+	const helixDiffs = compareDirectories(
+		join(__dirname, "../../configs/helix"),
+		join(homedir(), ".config", "helix"),
+	);
+	allDiffs.push(...helixDiffs);
+
+	// Compare tmux config
+	const tmuxDiff = compareFiles(
+		join(__dirname, "../../configs/tmux/tmux.conf"),
+		join(homedir(), ".config", "tmux", "tmux.conf"),
+	);
+	if (tmuxDiff) {
+		allDiffs.push(tmuxDiff);
+	}
+
+	displayDiff(allDiffs);
+}
+
 export const installCommand = new Command("install").description(
 	"Install configuration files from repo to system",
 );
@@ -317,6 +358,7 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
+	.option("--diff", "Show differences before installation")
 	.option(
 		"--from <backup>",
 		"Install from a specific backup (e.g., 2024-01-15)",
@@ -325,12 +367,13 @@ installCommand
 		const dryrun = options.dryrun || false;
 		const force = options.force || false;
 		const verify = options.verify !== false;
+		const showDiff = options.diff || false;
 		const from = options.from;
 		const sourceDesc = from ? `backup (${from})` : "repo";
 		console.log(
 			`Installing all configurations from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults(installAll(dryrun, force, from), dryrun, verify);
+		displayResults(installAll(dryrun, force, from), dryrun, verify, showDiff);
 	});
 
 // Subcommand: install all
@@ -343,6 +386,7 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
+	.option("--diff", "Show differences before installation")
 	.option(
 		"--from <backup>",
 		"Install from a specific backup (e.g., 2024-01-15)",
@@ -354,12 +398,13 @@ installCommand
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
+		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
 		const sourceDesc = from ? `backup (${from})` : "repo";
 		console.log(
 			`Installing all configurations from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults(installAll(dryrun, force, from), dryrun, verify);
+		displayResults(installAll(dryrun, force, from), dryrun, verify, showDiff);
 	});
 
 // Subcommand: install helix
@@ -373,6 +418,7 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
+	.option("--diff", "Show differences before installation")
 	.option(
 		"--from <backup>",
 		"Install from a specific backup (e.g., 2024-01-15)",
@@ -384,12 +430,13 @@ installCommand
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
+		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
 		const sourceDesc = from ? `backup (${from})` : "repo";
 		console.log(
 			`Installing Helix configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([installHelix(dryrun, force, from)], dryrun, verify);
+		displayResults([installHelix(dryrun, force, from)], dryrun, verify, showDiff);
 	});
 
 // Subcommand: install tmux
@@ -402,6 +449,7 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
+	.option("--diff", "Show differences before installation")
 	.option(
 		"--from <backup>",
 		"Install from a specific backup (e.g., 2024-01-15)",
@@ -413,12 +461,13 @@ installCommand
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
+		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
 		const sourceDesc = from ? `backup (${from})` : "repo";
 		console.log(
 			`Installing tmux configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([installTmux(dryrun, force, from)], dryrun, verify);
+		displayResults([installTmux(dryrun, force, from)], dryrun, verify, showDiff);
 	});
 
 // Subcommand: install bashrc
@@ -432,6 +481,7 @@ installCommand
 	)
 	.option("-f, --force", "Force overwrite existing files")
 	.option("--no-verify", "Skip verification after installation")
+	.option("--diff", "Show differences before installation")
 	.option(
 		"--from <backup>",
 		"Install from a specific backup (e.g., 2024-01-15)",
@@ -443,10 +493,11 @@ installCommand
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
+		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
 		const sourceDesc = from ? `backup (${from})` : "repo";
 		console.log(
 			`Installing bashrc configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([installBashrc(dryrun, force, from)], dryrun, verify);
+		displayResults([installBashrc(dryrun, force, from)], dryrun, verify, showDiff);
 	});

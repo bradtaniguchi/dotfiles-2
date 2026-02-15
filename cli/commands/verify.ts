@@ -4,6 +4,8 @@ import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
+import { compareFiles, compareDirectories } from "../utils/diff.ts";
+import { displayDiff } from "../utils/diff-renderer.tsx";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -197,7 +199,7 @@ function verifyAll(): VerifyResult[] {
 	];
 }
 
-function displayResults(results: VerifyResult[]): void {
+function displayResults(results: VerifyResult[], showDiff = false): void {
 	let allInstalled = true;
 	let hasWarnings = false;
 
@@ -255,22 +257,61 @@ function displayResults(results: VerifyResult[]): void {
 		);
 		process.exit(1);
 	}
+
+	// Show diff if requested
+	if (showDiff) {
+		console.log("\nShowing differences:\n");
+		showConfigDiffs();
+	}
+}
+
+function showConfigDiffs(): void {
+	const allDiffs = [];
+
+	// Compare bashrc
+	const bashrcDiff = compareFiles(
+		join(__dirname, "../../configs/bashrc"),
+		join(homedir(), ".bashrc"),
+	);
+	if (bashrcDiff) {
+		allDiffs.push(bashrcDiff);
+	}
+
+	// Compare helix config
+	const helixDiffs = compareDirectories(
+		join(__dirname, "../../configs/helix"),
+		join(homedir(), ".config", "helix"),
+	);
+	allDiffs.push(...helixDiffs);
+
+	// Compare tmux config
+	const tmuxDiff = compareFiles(
+		join(__dirname, "../../configs/tmux/tmux.conf"),
+		join(homedir(), ".config", "tmux", "tmux.conf"),
+	);
+	if (tmuxDiff) {
+		allDiffs.push(tmuxDiff);
+	}
+
+	displayDiff(allDiffs);
 }
 
 export const verifyCommand = new Command("verify")
 	.description("Verify configuration files are correctly installed")
-	.action(() => {
+	.option("--diff", "Show differences between repo and installed configs")
+	.action((options) => {
 		console.log("Verifying configurations...\n");
-		displayResults(verifyAll());
+		displayResults(verifyAll(), options.diff);
 	});
 
 // Subcommand: verify all
 verifyCommand
 	.command("all")
 	.description("Verify all configurations")
-	.action(() => {
+	.option("--diff", "Show differences between repo and installed configs")
+	.action((options) => {
 		console.log("Verifying all configurations...\n");
-		displayResults(verifyAll());
+		displayResults(verifyAll(), options.diff);
 	});
 
 // Subcommand: verify helix
@@ -333,9 +374,10 @@ verifyCommand
 	.command("bashrc")
 	.alias("bash")
 	.description("Verify bashrc installation and content")
-	.action(() => {
+	.option("--diff", "Show differences between repo and installed configs")
+	.action((options) => {
 		console.log("Verifying bashrc...\n");
-		displayResults([verifyBashrc()]);
+		displayResults([verifyBashrc()], options.diff);
 	});
 
 // Subcommand: verify gh
