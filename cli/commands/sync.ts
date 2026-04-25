@@ -147,7 +147,12 @@ function syncAll(dryrun = false): SyncResult[] {
 	return [syncHelix(dryrun), syncTmux(dryrun), syncBashrc(dryrun)];
 }
 
-function displayResults(results: SyncResult[], dryrun = false): void {
+interface DisplayResultsOptions {
+	results: SyncResult[];
+	dryrun?: boolean;
+}
+
+function displayResults({ results, dryrun = false }: DisplayResultsOptions): void {
 	let allSucceeded = true;
 
 	for (const result of results) {
@@ -187,7 +192,7 @@ syncCommand.action((options) => {
 	console.log(
 		`Syncing all configurations from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 	);
-	displayResults(syncAll(dryrun), dryrun);
+	displayResults({ results: syncAll(dryrun), dryrun });
 });
 
 // Subcommand: sync all
@@ -202,7 +207,7 @@ syncCommand
 		console.log(
 			`Syncing all configurations from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults(syncAll(dryrun), dryrun);
+		displayResults({ results: syncAll(dryrun), dryrun });
 	});
 
 // Subcommand: sync helix
@@ -218,7 +223,7 @@ syncCommand
 		console.log(
 			`Syncing Helix configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([syncHelix(dryrun)], dryrun);
+		displayResults({ results: [syncHelix(dryrun)], dryrun });
 	});
 
 // Subcommand: sync tmux
@@ -233,7 +238,7 @@ syncCommand
 		console.log(
 			`Syncing tmux configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([syncTmux(dryrun)], dryrun);
+		displayResults({ results: [syncTmux(dryrun)], dryrun });
 	});
 
 // Subcommand: sync bashrc
@@ -249,5 +254,5 @@ syncCommand
 		console.log(
 			`Syncing bashrc configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 		);
-		displayResults([syncBashrc(dryrun)], dryrun);
+		displayResults({ results: [syncBashrc(dryrun)], dryrun });
 	});

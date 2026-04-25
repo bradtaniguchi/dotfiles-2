@@ -4,6 +4,7 @@ import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
+import { showConfigDiffs } from "../utils/show-config-diffs.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -197,7 +198,15 @@ function verifyAll(): VerifyResult[] {
 	];
 }
 
-function displayResults(results: VerifyResult[]): void {
+interface DisplayResultsOptions {
+	results: VerifyResult[];
+	showDiff?: boolean;
+}
+
+function displayResults({
+	results,
+	showDiff = false,
+}: DisplayResultsOptions): void {
 	let allInstalled = true;
 	let hasWarnings = false;
 
@@ -243,6 +252,14 @@ function displayResults(results: VerifyResult[]): void {
 	}
 
 	console.log();
+
+	// Show diff if requested (before potential exit)
+	if (showDiff) {
+		console.log("\nShowing differences:\n");
+		showConfigDiffs();
+		console.log();
+	}
+
 	if (allInstalled && !hasWarnings) {
 		console.log("\x1b[32m✓ All configurations verified successfully!\x1b[0m");
 	} else if (allInstalled && hasWarnings) {
@@ -259,18 +276,30 @@ function displayResults(results: VerifyResult[]): void {
 
 export const verifyCommand = new Command("verify")
 	.description("Verify configuration files are correctly installed")
-	.action(() => {
+	.option("--diff", "Show differences between repo and installed configs")
+	.action((options) => {
 		console.log("Verifying configurations...\n");
-		displayResults(verifyAll());
+		displayResults({
+			results: verifyAll(),
+			showDiff: options.diff,
+		});
 	});
 
 // Subcommand: verify all
 verifyCommand
 	.command("all")
 	.description("Verify all configurations")
-	.action(() => {
+	.option("--diff", "Show differences between repo and installed configs")
+	.action((...args) => {
+		const cmd = args[args.length - 1];
+		const options = cmd.opts();
+		const parentOptions = cmd.parent?.opts() || {};
+		const showDiff = options.diff || parentOptions.diff || false;
 		console.log("Verifying all configurations...\n");
-		displayResults(verifyAll());
+		displayResults({
+			results: verifyAll(),
+			showDiff,
+		});
 	});
 
 // Subcommand: verify helix
@@ -280,7 +309,7 @@ verifyCommand
 	.description("Verify Helix IDE installation")
 	.action(() => {
 		console.log("Verifying Helix IDE...\n");
-		displayResults([verifyHelix()]);
+		displayResults({ results: [verifyHelix()] });
 	});
 
 // Subcommand: verify tmux
@@ -289,7 +318,7 @@ verifyCommand
 	.description("Verify tmux installation")
 	.action(() => {
 		console.log("Verifying tmux...\n");
-		displayResults([verifyTmux()]);
+		displayResults({ results: [verifyTmux()] });
 	});
 
 // Subcommand: verify nvm
@@ -298,7 +327,7 @@ verifyCommand
 	.description("Verify nvm installation")
 	.action(() => {
 		console.log("Verifying nvm...\n");
-		displayResults([verifyNvm()]);
+		displayResults({ results: [verifyNvm()] });
 	});
 
 // Subcommand: verify fzf
@@ -307,7 +336,7 @@ verifyCommand
 	.description("Verify fzf installation")
 	.action(() => {
 		console.log("Verifying fzf...\n");
-		displayResults([verifyFzf()]);
+		displayResults({ results: [verifyFzf()] });
 	});
 
 // Subcommand: verify zoxide
@@ -316,7 +345,7 @@ verifyCommand
 	.description("Verify zoxide installation")
 	.action(() => {
 		console.log("Verifying zoxide...\n");
-		displayResults([verifyZoxide()]);
+		displayResults({ results: [verifyZoxide()] });
 	});
 
 // Subcommand: verify starship
@@ -325,7 +354,7 @@ verifyCommand
 	.description("Verify starship installation")
 	.action(() => {
 		console.log("Verifying starship...\n");
-		displayResults([verifyStarship()]);
+		displayResults({ results: [verifyStarship()] });
 	});
 
 // Subcommand: verify bashrc
@@ -333,9 +362,17 @@ verifyCommand
 	.command("bashrc")
 	.alias("bash")
 	.description("Verify bashrc installation and content")
-	.action(() => {
+	.option("--diff", "Show differences between repo and installed configs")
+	.action((...args) => {
+		const cmd = args[args.length - 1];
+		const options = cmd.opts();
+		const parentOptions = cmd.parent?.opts() || {};
+		const showDiff = options.diff || parentOptions.diff || false;
 		console.log("Verifying bashrc...\n");
-		displayResults([verifyBashrc()]);
+		displayResults({
+			results: [verifyBashrc()],
+			showDiff,
+		});
 	});
 
 // Subcommand: verify gh
@@ -344,7 +381,7 @@ verifyCommand
 	.description("Verify GitHub CLI installation (optional)")
 	.action(() => {
 		console.log("Verifying GitHub CLI...\n");
-		displayResults([verifyGh()]);
+		displayResults({ results: [verifyGh()] });
 	});
 
 // Subcommand: verify htop
@@ -353,7 +390,7 @@ verifyCommand
 	.description("Verify htop installation (optional)")
 	.action(() => {
 		console.log("Verifying htop...\n");
-		displayResults([verifyHtop()]);
+		displayResults({ results: [verifyHtop()] });
 	});
 
 // Export verification functions for use in other commands
