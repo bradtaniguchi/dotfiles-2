@@ -1,4 +1,4 @@
-theme = "color75"
+theme = "color75-light"
 
 [editor]
 line-number = "absolute"
