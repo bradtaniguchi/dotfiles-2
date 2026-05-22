@@ -1,0 +1,73 @@
+# Light theme based on tmux color75 (#5fafff)
+# Designed for light terminal backgrounds
+
+"ui.background" = { bg = "#f5f5f5" }
+"ui.text" = "#1a1a1a"
+"ui.text.focus" = "#000000"
+"ui.cursor" = { fg = "#f5f5f5", bg = "#005faf" }
+"ui.cursor.match" = { bg = "#d0e8ff", underline = { color = "#005faf", style = "curl" } }
+"ui.selection" = { bg = "#b0d0f0" }
+"ui.linenr" = "#767676"
+"ui.linenr.selected" = "#005faf"
+"ui.statusline" = { fg = "#ffffff", bg = "#005faf" }
+"ui.statusline.inactive" = { fg = "#767676", bg = "#e0e0e0" }
+"ui.menu" = { fg = "#1a1a1a", bg = "#ffffff" }
+"ui.menu.selected" = { fg = "#ffffff", bg = "#005faf" }
+"ui.popup" = { fg = "#1a1a1a", bg = "#ffffff" }
+"ui.window" = { fg = "#b0b0b0" }
+"ui.help" = { fg = "#1a1a1a", bg = "#ffffff" }
+"ui.virtual.ruler" = { bg = "#e5e5e5" }
+
+"string" = "#005faf"
+"constant" = "#00628e"
+"constant.numeric" = "#006f9e"
+"constant.character.escape" = "#007099"
+
+"comment" = "#767676"
+"comment.documentation" = "#606060"
+
+"variable" = "#1a1a1a"
+"variable.parameter" = "#005f87"
+"variable.builtin" = "#005faf"
+
+"keyword" = "#005faf"
+"keyword.control" = "#005faf"
+"keyword.operator" = "#005f87"
+
+"function" = "#005f87"
+"function.builtin" = "#0077a8"
+"function.macro" = "#005faf"
+
+"type" = "#005faf"
+"type.builtin" = "#005f87"
+
+"constructor" = "#005f87"
+"operator" = "#005f87"
+
+"attribute" = "#005f87"
+"namespace" = "#005faf"
+"tag" = "#005faf"
+
+"special" = "#006f9e"
+"markup.heading" = "#005faf"
+"markup.list" = "#005f87"
+"markup.bold" = { fg = "#005faf", modifiers = ["bold"] }
+"markup.italic" = { fg = "#005f87", modifiers = ["italic"] }
+"markup.link.url" = { fg = "#006f9e", underline = { style = "line" } }
+"markup.link.text" = "#005f87"
+"markup.quote" = "#005f87"
+"markup.raw" = "#005faf"
+
+"diff.plus" = "#007700"
+"diff.delta" = "#7f7f00"
+"diff.minus" = "#af0000"
+
+"diagnostic.error" = { underline = { color = "#d70000", style = "curl" } }
+"diagnostic.warning" = { underline = { color = "#af7700", style = "curl" } }
+"diagnostic.info" = { underline = { color = "#005faf", style = "curl" } }
+"diagnostic.hint" = { underline = { color = "#767676", style = "curl" } }
+
+"error" = "#d70000"
+"warning" = "#af7700"
+"info" = "#005faf"
+"hint" = "#767676"
