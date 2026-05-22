@@ -7,14 +7,14 @@
 "ui.cursor" = { fg = "#f5f5f5", bg = "#005faf" }
 "ui.cursor.match" = { bg = "#d0e8ff", underline = { color = "#005faf", style = "curl" } }
 "ui.selection" = { bg = "#b0d0f0" }
-"ui.linenr" = "#767676"
+"ui.linenr" = "#595959"
 "ui.linenr.selected" = "#005faf"
 "ui.statusline" = { fg = "#ffffff", bg = "#005faf" }
-"ui.statusline.inactive" = { fg = "#767676", bg = "#e0e0e0" }
+"ui.statusline.inactive" = { fg = "#3d3d3d", bg = "#e0e0e0" }
 "ui.menu" = { fg = "#1a1a1a", bg = "#ffffff" }
 "ui.menu.selected" = { fg = "#ffffff", bg = "#005faf" }
 "ui.popup" = { fg = "#1a1a1a", bg = "#ffffff" }
-"ui.window" = { fg = "#b0b0b0" }
+"ui.window" = { fg = "#888888" }
 "ui.help" = { fg = "#1a1a1a", bg = "#ffffff" }
 "ui.virtual.ruler" = { bg = "#e5e5e5" }
 
@@ -23,10 +23,11 @@
 "constant.numeric" = "#006f9e"
 "constant.character.escape" = "#007099"
 
-"comment" = "#767676"
+"comment" = "#595959"
 "comment.documentation" = "#606060"
 
 "variable" = "#1a1a1a"
+"variable.other.member" = "#005f87"
 "variable.parameter" = "#005f87"
 "variable.builtin" = "#005faf"
 
@@ -59,7 +60,7 @@
 "markup.raw" = "#005faf"
 
 "diff.plus" = "#007700"
-"diff.delta" = "#7f7f00"
+"diff.delta" = "#5f5f00"
 "diff.minus" = "#af0000"
 
 "diagnostic.error" = { underline = { color = "#d70000", style = "curl" } }
@@ -70,4 +71,4 @@
 "error" = "#d70000"
 "warning" = "#af7700"
 "info" = "#005faf"
-"hint" = "#767676"
+"hint" = "#595959"
