@@ -143,8 +143,80 @@ function syncBashrc(dryrun = false): SyncResult {
 	}
 }
 
+function syncZed(dryrun = false): SyncResult {
+	try {
+		const repoRoot = join(__dirname, "../..");
+		const source = join(homedir(), ".config", "zed", "settings.json");
+		const dest = join(repoRoot, "configs/zed/settings.json");
+
+		if (!existsSync(source)) {
+			return {
+				name: "zed",
+				success: false,
+				message: "~/.config/zed/settings.json not found",
+			};
+		}
+
+		if (!dryrun) {
+			const parentDir = dirname(dest);
+			if (!existsSync(parentDir)) {
+				mkdirSync(parentDir, { recursive: true });
+			}
+			copyFileSync(source, dest);
+		}
+
+		return {
+			name: "zed",
+			success: true,
+			message: dryrun ? `Would sync: ${source} → ${dest}` : undefined,
+		};
+	} catch (error) {
+		return {
+			name: "zed",
+			success: false,
+			message: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
+function syncOpencode(dryrun = false): SyncResult {
+	try {
+		const repoRoot = join(__dirname, "../..");
+		const source = join(homedir(), ".config", "opencode", "opencode.jsonc");
+		const dest = join(repoRoot, "configs/opencode/opencode.jsonc");
+
+		if (!existsSync(source)) {
+			return {
+				name: "opencode",
+				success: false,
+				message: "~/.config/opencode/opencode.jsonc not found",
+			};
+		}
+
+		if (!dryrun) {
+			const parentDir = dirname(dest);
+			if (!existsSync(parentDir)) {
+				mkdirSync(parentDir, { recursive: true });
+			}
+			copyFileSync(source, dest);
+		}
+
+		return {
+			name: "opencode",
+			success: true,
+			message: dryrun ? `Would sync: ${source} → ${dest}` : undefined,
+		};
+	} catch (error) {
+		return {
+			name: "opencode",
+			success: false,
+			message: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
 function syncAll(dryrun = false): SyncResult[] {
-	return [syncHelix(dryrun), syncTmux(dryrun), syncBashrc(dryrun)];
+	return [syncHelix(dryrun), syncTmux(dryrun), syncBashrc(dryrun), syncZed(dryrun), syncOpencode(dryrun)];
 }
 
 interface DisplayResultsOptions {
@@ -255,4 +327,34 @@ syncCommand
 			`Syncing bashrc configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({ results: [syncBashrc(dryrun)], dryrun });
+	});
+
+// Subcommand: sync zed
+syncCommand
+	.command("zed")
+	.description("Sync Zed configuration")
+	.option("-d, --dryrun", "Show what would be synced without actually syncing")
+	.action((_, cmd) => {
+		const options = cmd.opts();
+		const parentOptions = cmd.parent?.opts() || {};
+		const dryrun = options.dryrun || parentOptions.dryrun || false;
+		console.log(
+			`Syncing Zed configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
+		);
+		displayResults({ results: [syncZed(dryrun)], dryrun });
+	});
+
+// Subcommand: sync opencode
+syncCommand
+	.command("opencode")
+	.description("Sync opencode configuration")
+	.option("-d, --dryrun", "Show what would be synced without actually syncing")
+	.action((_, cmd) => {
+		const options = cmd.opts();
+		const parentOptions = cmd.parent?.opts() || {};
+		const dryrun = options.dryrun || parentOptions.dryrun || false;
+		console.log(
+			`Syncing opencode configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
+		);
+		displayResults({ results: [syncOpencode(dryrun)], dryrun });
 	});

@@ -8,6 +8,8 @@ import {
 	verifyBashrc,
 	verifyHelixConfig,
 	verifyTmuxConfig,
+	verifyZedConfig,
+	verifyOpencodeConfig,
 } from "./verify.ts";
 import { showConfigDiffs } from "../utils/show-config-diffs.ts";
 
@@ -221,6 +223,116 @@ function installBashrc(
 	}
 }
 
+function installZed(
+	dryrun = false,
+	force = false,
+	from?: string,
+): InstallResult {
+	try {
+		const repoRoot = join(__dirname, "../..");
+		const sourceBase = from
+			? join(repoRoot, "backups", from)
+			: join(repoRoot, "configs");
+		const source = join(sourceBase, "zed/settings.json");
+		const dest = join(homedir(), ".config", "zed", "settings.json");
+
+		if (!existsSync(source)) {
+			return {
+				name: "zed",
+				success: false,
+				message: from
+					? `backups/${from}/zed/settings.json not found`
+					: "configs/zed/settings.json not found in repo",
+			};
+		}
+
+		if (!force && existsSync(dest)) {
+			return {
+				name: "zed",
+				success: true,
+				skipped: true,
+				message:
+					"~/.config/zed/settings.json already exists (use --force to overwrite)",
+			};
+		}
+
+		if (!dryrun) {
+			const parentDir = dirname(dest);
+			if (!existsSync(parentDir)) {
+				mkdirSync(parentDir, { recursive: true });
+			}
+			copyFileSync(source, dest);
+		}
+
+		return {
+			name: "zed",
+			success: true,
+			message: dryrun ? `Would install: ${source} → ${dest}` : undefined,
+		};
+	} catch (error) {
+		return {
+			name: "zed",
+			success: false,
+			message: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
+function installOpencode(
+	dryrun = false,
+	force = false,
+	from?: string,
+): InstallResult {
+	try {
+		const repoRoot = join(__dirname, "../..");
+		const sourceBase = from
+			? join(repoRoot, "backups", from)
+			: join(repoRoot, "configs");
+		const source = join(sourceBase, "opencode/opencode.jsonc");
+		const dest = join(homedir(), ".config", "opencode", "opencode.jsonc");
+
+		if (!existsSync(source)) {
+			return {
+				name: "opencode",
+				success: false,
+				message: from
+					? `backups/${from}/opencode/opencode.jsonc not found`
+					: "configs/opencode/opencode.jsonc not found in repo",
+			};
+		}
+
+		if (!force && existsSync(dest)) {
+			return {
+				name: "opencode",
+				success: true,
+				skipped: true,
+				message:
+					"~/.config/opencode/opencode.jsonc already exists (use --force to overwrite)",
+			};
+		}
+
+		if (!dryrun) {
+			const parentDir = dirname(dest);
+			if (!existsSync(parentDir)) {
+				mkdirSync(parentDir, { recursive: true });
+			}
+			copyFileSync(source, dest);
+		}
+
+		return {
+			name: "opencode",
+			success: true,
+			message: dryrun ? `Would install: ${source} → ${dest}` : undefined,
+		};
+	} catch (error) {
+		return {
+			name: "opencode",
+			success: false,
+			message: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
 function installAll(
 	dryrun = false,
 	force = false,
@@ -230,6 +342,8 @@ function installAll(
 		installHelix(dryrun, force, from),
 		installTmux(dryrun, force, from),
 		installBashrc(dryrun, force, from),
+		installZed(dryrun, force, from),
+		installOpencode(dryrun, force, from),
 	];
 }
 
@@ -246,6 +360,12 @@ function getVerifyResults(items: string[]): VerifyResult[] {
 				break;
 			case "bashrc":
 				results.push(verifyBashrc());
+				break;
+			case "zed":
+				results.push(verifyZedConfig());
+				break;
+			case "opencode":
+				results.push(verifyOpencodeConfig());
 				break;
 		}
 	}
@@ -496,6 +616,78 @@ installCommand
 		);
 		displayResults({
 			results: [installBashrc(dryrun, force, from)],
+			dryrun,
+			verify,
+			showDiff,
+		});
+	});
+
+// Subcommand: install zed
+installCommand
+	.command("zed")
+	.description("Install Zed configuration")
+	.option(
+		"-d, --dryrun",
+		"Show what would be installed without actually installing",
+	)
+	.option("-f, --force", "Force overwrite existing files")
+	.option("--no-verify", "Skip verification after installation")
+	.option("--diff", "Show differences before installation")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
+	.action((...args) => {
+		const cmd = args[args.length - 1];
+		const options = cmd.opts();
+		const parentOptions = cmd.parent?.opts() || {};
+		const dryrun = options.dryrun || parentOptions.dryrun || false;
+		const force = options.force || parentOptions.force || false;
+		const verify = options.verify !== false && parentOptions.verify !== false;
+		const showDiff = options.diff || parentOptions.diff || false;
+		const from = options.from || parentOptions.from;
+		const sourceDesc = from ? `backup (${from})` : "repo";
+		console.log(
+			`Installing Zed configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
+		);
+		displayResults({
+			results: [installZed(dryrun, force, from)],
+			dryrun,
+			verify,
+			showDiff,
+		});
+	});
+
+// Subcommand: install opencode
+installCommand
+	.command("opencode")
+	.description("Install opencode configuration")
+	.option(
+		"-d, --dryrun",
+		"Show what would be installed without actually installing",
+	)
+	.option("-f, --force", "Force overwrite existing files")
+	.option("--no-verify", "Skip verification after installation")
+	.option("--diff", "Show differences before installation")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
+	.action((...args) => {
+		const cmd = args[args.length - 1];
+		const options = cmd.opts();
+		const parentOptions = cmd.parent?.opts() || {};
+		const dryrun = options.dryrun || parentOptions.dryrun || false;
+		const force = options.force || parentOptions.force || false;
+		const verify = options.verify !== false && parentOptions.verify !== false;
+		const showDiff = options.diff || parentOptions.diff || false;
+		const from = options.from || parentOptions.from;
+		const sourceDesc = from ? `backup (${from})` : "repo";
+		console.log(
+			`Installing opencode configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
+		);
+		displayResults({
+			results: [installOpencode(dryrun, force, from)],
 			dryrun,
 			verify,
 			showDiff,

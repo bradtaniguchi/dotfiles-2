@@ -53,11 +53,31 @@ function getBashrcBackupItem(backupDir: string): BackupItem {
 	};
 }
 
+function getZedBackupItem(backupDir: string): BackupItem {
+	return {
+		source: join(homedir(), ".config", "zed", "settings.json"),
+		destination: join(backupDir, "zed", "settings.json"),
+		type: "file",
+		name: "zed",
+	};
+}
+
+function getOpencodeBackupItem(backupDir: string): BackupItem {
+	return {
+		source: join(homedir(), ".config", "opencode", "opencode.jsonc"),
+		destination: join(backupDir, "opencode", "opencode.jsonc"),
+		type: "file",
+		name: "opencode",
+	};
+}
+
 function getBackupItems(backupDir: string): BackupItem[] {
 	return [
 		getHelixBackupItem(backupDir),
 		getTmuxBackupItem(backupDir),
 		getBashrcBackupItem(backupDir),
+		getZedBackupItem(backupDir),
+		getOpencodeBackupItem(backupDir),
 	];
 }
 
@@ -259,6 +279,44 @@ backupCommand
 		mkdirSync(backupDir, { recursive: true });
 
 		const items = [getBashrcBackupItem(backupDir)];
+		const results = performBackup(items);
+		displayBackupResults(results, `backups/${dateStr}`);
+	});
+
+// Subcommand: backup zed
+backupCommand
+	.command("zed")
+	.description("Backup Zed configuration")
+	.action(() => {
+		console.log("Creating Zed backup...\n");
+
+		const today = new Date();
+		const dateStr = today.toISOString().split("T")[0];
+		const repoRoot = join(__dirname, "../..");
+		const backupDir = join(repoRoot, "backups", dateStr);
+
+		mkdirSync(backupDir, { recursive: true });
+
+		const items = [getZedBackupItem(backupDir)];
+		const results = performBackup(items);
+		displayBackupResults(results, `backups/${dateStr}`);
+	});
+
+// Subcommand: backup opencode
+backupCommand
+	.command("opencode")
+	.description("Backup opencode configuration")
+	.action(() => {
+		console.log("Creating opencode backup...\n");
+
+		const today = new Date();
+		const dateStr = today.toISOString().split("T")[0];
+		const repoRoot = join(__dirname, "../..");
+		const backupDir = join(repoRoot, "backups", dateStr);
+
+		mkdirSync(backupDir, { recursive: true });
+
+		const items = [getOpencodeBackupItem(backupDir)];
 		const results = performBackup(items);
 		displayBackupResults(results, `backups/${dateStr}`);
 	});
