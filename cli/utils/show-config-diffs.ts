@@ -38,5 +38,23 @@ export function showConfigDiffs(): void {
 		allDiffs.push(tmuxDiff);
 	}
 
+	// Compare zed config
+	const zedDiff = compareFiles(
+		join(__dirname, "../../configs/zed/settings.json"),
+		join(homedir(), ".config", "zed", "settings.json"),
+	);
+	if (zedDiff) {
+		allDiffs.push(zedDiff);
+	}
+
+	// Compare opencode config
+	const opencodeDiff = compareFiles(
+		join(__dirname, "../../configs/opencode/opencode.jsonc"),
+		join(homedir(), ".config", "opencode", "opencode.jsonc"),
+	);
+	if (opencodeDiff) {
+		allDiffs.push(opencodeDiff);
+	}
+
 	displayDiff(allDiffs);
 }

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@tarquinen/opencode-dcp@latest", "opencode-mem"],
+   "provider": {
+    "lmstudio": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LM Studio (local)",
+      "options": {
+        "baseURL": "http://127.0.0.1:1234/v1"
+      },
+      "models": {
+        "mistralai/ministral-3-3b": {
+          "name": "mistralai/ministral-3-3b (local)"
+        }
+      }
+    }
+  }
+}

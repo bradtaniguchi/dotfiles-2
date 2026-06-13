@@ -123,6 +123,40 @@ function verifyBashrc(): VerifyResult {
 	}
 }
 
+function verifyZedConfig(): VerifyResult {
+	const zedConfigPath = join(homedir(), ".config", "zed", "settings.json");
+
+	if (!existsSync(zedConfigPath)) {
+		return {
+			name: "zed",
+			installed: false,
+			message: "~/.config/zed/settings.json not found",
+		};
+	}
+
+	return {
+		name: "zed",
+		installed: true,
+	};
+}
+
+function verifyOpencodeConfig(): VerifyResult {
+	const opencodePath = join(homedir(), ".config", "opencode", "opencode.jsonc");
+
+	if (!existsSync(opencodePath)) {
+		return {
+			name: "opencode",
+			installed: false,
+			message: "~/.config/opencode/opencode.jsonc not found",
+		};
+	}
+
+	return {
+		name: "opencode",
+		installed: true,
+	};
+}
+
 function verifyHelixConfig(): VerifyResult {
 	const helixConfigPath = join(homedir(), ".config", "helix");
 
@@ -193,6 +227,8 @@ function verifyAll(): VerifyResult[] {
 		verifyZoxide(),
 		verifyStarship(),
 		verifyBashrc(),
+		verifyZedConfig(),
+		verifyOpencodeConfig(),
 		verifyGh(),
 		verifyHtop(),
 	];
@@ -393,5 +429,23 @@ verifyCommand
 		displayResults({ results: [verifyHtop()] });
 	});
 
+// Subcommand: verify zed
+verifyCommand
+	.command("zed")
+	.description("Verify Zed configuration")
+	.action(() => {
+		console.log("Verifying Zed configuration...\n");
+		displayResults({ results: [verifyZedConfig()] });
+	});
+
+// Subcommand: verify opencode
+verifyCommand
+	.command("opencode")
+	.description("Verify opencode configuration")
+	.action(() => {
+		console.log("Verifying opencode configuration...\n");
+		displayResults({ results: [verifyOpencodeConfig()] });
+	});
+
 // Export verification functions for use in other commands
-export { verifyHelixConfig, verifyTmuxConfig, verifyBashrc };
+export { verifyHelixConfig, verifyTmuxConfig, verifyBashrc, verifyZedConfig, verifyOpencodeConfig };
