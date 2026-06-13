@@ -9,9 +9,6 @@
 {
   "terminal": {
     "font_family": "FiraCode Nerd Font Mono",
-    "shell": {
-      "program": "/opt/homebrew/bin/bash",
-    },
   },
   "git_panel": {
     "dock": "left",
