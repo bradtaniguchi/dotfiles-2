@@ -69,8 +69,46 @@ export function parseJsonc(content: string): any {
 	});
 	cleaned = processedLines.join("\n");
 
-	// Strip trailing commas before closing braces/brackets
-	cleaned = cleaned.replace(/,(\s*[}\]])/g, "$1");
+	// Strip trailing commas before closing braces/brackets (only when not inside strings)
+	{
+		let out = "";
+		let inString = false;
+		let escaped = false;
+
+		for (let i = 0; i < cleaned.length; i++) {
+			const char = cleaned[i];
+
+			if (escaped) {
+				escaped = false;
+				out += char;
+				continue;
+			}
+			if (char === "\\") {
+				escaped = true;
+				out += char;
+				continue;
+			}
+			if (char === '"') {
+				inString = !inString;
+				out += char;
+				continue;
+			}
+
+			if (!inString && char === ",") {
+				let j = i + 1;
+				while (j < cleaned.length && /\s/.test(cleaned[j])) {
+					j++;
+				}
+				if (cleaned[j] === "}" || cleaned[j] === "]") {
+					continue;
+				}
+			}
+
+			out += char;
+		}
+
+		cleaned = out;
+	}
 
 	return JSON.parse(cleaned);
 }
