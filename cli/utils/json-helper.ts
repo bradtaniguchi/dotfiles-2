@@ -133,7 +133,10 @@ export function findJsonConflict(
 		!Array.isArray(dest)
 	) {
 		for (const key of Object.keys(source)) {
-			if (key in dest) {
+			if (key === "__proto__" || key === "constructor" || key === "prototype") {
+				return path ? `${path}.${key}` : key;
+			}
+			if (Object.hasOwn(dest, key)) {
 				const currentPath = path ? `${path}.${key}` : key;
 				const conflict = findJsonConflict(source[key], dest[key], currentPath);
 				if (conflict) {
