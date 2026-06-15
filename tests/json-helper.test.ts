@@ -16,10 +16,25 @@ describe("JSON/JSONC helper tests", () => {
 		comment */
 		"a": 1, // inline comment
 		"b": "string with https://example.com/url and // chars",
+		"e": "literal /* not a comment */ and ,} should stay",
 		"c": {
 			"d": [1, 2],
 		}
 	}
+	`;
+	const parsed = parseJsonc(rawJsonc);
+	assert.strictEqual(parsed.a, 1, "parsed.a should be 1");
+	assert.strictEqual(
+		parsed.b,
+		"string with https://example.com/url and // chars",
+		"parsed.b should match string with slashes",
+	);
+	assert.strictEqual(
+		parsed.e,
+		"literal /* not a comment */ and ,} should stay",
+		"parsed.e should preserve comment/comma markers inside strings",
+	);
+	assert.deepStrictEqual(parsed.c.d, [1, 2], "parsed.c.d should be [1, 2]");
 	`;
 	const parsed = parseJsonc(rawJsonc);
 	assert.strictEqual(parsed.a, 1, "parsed.a should be 1");
