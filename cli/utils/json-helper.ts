@@ -173,7 +173,10 @@ export function mergeJson(
 	) {
 		const result = { ...dest };
 		for (const key of Object.keys(source)) {
-			if (key in dest) {
+			if (key === "__proto__" || key === "constructor" || key === "prototype") {
+				continue;
+			}
+			if (Object.hasOwn(dest, key)) {
 				result[key] = mergeJson(source[key], dest[key]);
 			} else {
 				result[key] = source[key];
