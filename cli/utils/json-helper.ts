@@ -4,9 +4,44 @@
  */
 // biome-ignore lint/suspicious/noExplicitAny: JSON parsing returns any
 export function parseJsonc(content: string): any {
-	// Strip block comments /* ... */
-	let cleaned = content.replace(/\/\*[\s\S]*?\*\//g, "");
+	// Strip block comments /* ... */ (only when not inside strings)
+	let cleaned = "";
+	let inString = false;
+	let escaped = false;
 
+	for (let i = 0; i < content.length; i++) {
+		const char = content[i];
+		const next = content[i + 1];
+
+		if (escaped) {
+			escaped = false;
+			cleaned += char;
+			continue;
+		}
+		if (char === "\\") {
+			escaped = true;
+			cleaned += char;
+			continue;
+		}
+		if (char === '"') {
+			inString = !inString;
+			cleaned += char;
+			continue;
+		}
+		if (!inString && char === "/" && next === "*") {
+			i += 2;
+			while (
+				i < content.length - 1 &&
+				!(content[i] === "*" && content[i + 1] === "/")
+			) {
+				i++;
+			}
+			i++; // skip the '/' in closing '*/'
+			continue;
+		}
+
+		cleaned += char;
+	}
 	// Strip single line comments // ... (but avoid stripping URLs like https://...)
 	const lines = cleaned.split("\n");
 	const processedLines = lines.map((line) => {
