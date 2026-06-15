@@ -1,17 +1,29 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
+import {
+	copyFileSync,
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	readFileSync,
+	writeFileSync,
+} from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import {
+	findJsonConflict,
+	mergeJson,
+	parseJsonc,
+} from "../utils/json-helper.ts";
+import { showConfigDiffs } from "../utils/show-config-diffs.ts";
+import {
 	type VerifyResult,
 	verifyBashrc,
 	verifyHelixConfig,
+	verifyOpencodeConfig,
 	verifyTmuxConfig,
 	verifyZedConfig,
-	verifyOpencodeConfig,
 } from "./verify.ts";
-import { showConfigDiffs } from "../utils/show-config-diffs.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -72,6 +84,7 @@ function installHelix(
 	dryrun = false,
 	force = false,
 	from?: string,
+	_merge = false,
 ): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
@@ -122,6 +135,7 @@ function installTmux(
 	dryrun = false,
 	force = false,
 	from?: string,
+	_merge = false,
 ): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
@@ -177,6 +191,7 @@ function installBashrc(
 	dryrun = false,
 	force = false,
 	from?: string,
+	_merge = false,
 ): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
@@ -227,6 +242,7 @@ function installZed(
 	dryrun = false,
 	force = false,
 	from?: string,
+	merge = false,
 ): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
@@ -247,13 +263,55 @@ function installZed(
 		}
 
 		if (!force && existsSync(dest)) {
-			return {
-				name: "zed",
-				success: true,
-				skipped: true,
-				message:
-					"~/.config/zed/settings.json already exists (use --force to overwrite)",
-			};
+			if (merge) {
+				try {
+					const sourceContent = readFileSync(source, "utf-8");
+					const destContent = readFileSync(dest, "utf-8");
+					const sourceJson = parseJsonc(sourceContent);
+					const destJson = parseJsonc(destContent);
+
+					const conflict = findJsonConflict(sourceJson, destJson);
+					if (conflict) {
+						return {
+							name: "zed",
+							success: true,
+							skipped: true,
+							message: `~/.config/zed/settings.json already exists and has conflicting values (merge failed at: '${conflict}'; use --force to overwrite)`,
+						};
+					}
+
+					const merged = mergeJson(sourceJson, destJson);
+					if (!dryrun) {
+						const parentDir = dirname(dest);
+						if (!existsSync(parentDir)) {
+							mkdirSync(parentDir, { recursive: true });
+						}
+						writeFileSync(dest, `${JSON.stringify(merged, null, 2)}\n`);
+					}
+
+					return {
+						name: "zed",
+						success: true,
+						message: dryrun
+							? `Would merge configurations (no conflict detected): ${source} → ${dest}`
+							: `Merged and installed configuration successfully: ${source} → ${dest}`,
+					};
+				} catch (error) {
+					return {
+						name: "zed",
+						success: false,
+						message: `Failed to parse/merge JSON: ${error instanceof Error ? error.message : String(error)}`,
+					};
+				}
+			} else {
+				return {
+					name: "zed",
+					success: true,
+					skipped: true,
+					message:
+						"~/.config/zed/settings.json already exists (use --force to overwrite, or --merge to merge JSON without conflicts)",
+				};
+			}
 		}
 
 		if (!dryrun) {
@@ -282,6 +340,7 @@ function installOpencode(
 	dryrun = false,
 	force = false,
 	from?: string,
+	merge = false,
 ): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
@@ -302,13 +361,55 @@ function installOpencode(
 		}
 
 		if (!force && existsSync(dest)) {
-			return {
-				name: "opencode",
-				success: true,
-				skipped: true,
-				message:
-					"~/.config/opencode/opencode.jsonc already exists (use --force to overwrite)",
-			};
+			if (merge) {
+				try {
+					const sourceContent = readFileSync(source, "utf-8");
+					const destContent = readFileSync(dest, "utf-8");
+					const sourceJson = parseJsonc(sourceContent);
+					const destJson = parseJsonc(destContent);
+
+					const conflict = findJsonConflict(sourceJson, destJson);
+					if (conflict) {
+						return {
+							name: "opencode",
+							success: true,
+							skipped: true,
+							message: `~/.config/opencode/opencode.jsonc already exists and has conflicting values (merge failed at: '${conflict}'; use --force to overwrite)`,
+						};
+					}
+
+					const merged = mergeJson(sourceJson, destJson);
+					if (!dryrun) {
+						const parentDir = dirname(dest);
+						if (!existsSync(parentDir)) {
+							mkdirSync(parentDir, { recursive: true });
+						}
+						writeFileSync(dest, `${JSON.stringify(merged, null, 2)}\n`);
+					}
+
+					return {
+						name: "opencode",
+						success: true,
+						message: dryrun
+							? `Would merge configurations (no conflict detected): ${source} → ${dest}`
+							: `Merged and installed configuration successfully: ${source} → ${dest}`,
+					};
+				} catch (error) {
+					return {
+						name: "opencode",
+						success: false,
+						message: `Failed to parse/merge JSON: ${error instanceof Error ? error.message : String(error)}`,
+					};
+				}
+			} else {
+				return {
+					name: "opencode",
+					success: true,
+					skipped: true,
+					message:
+						"~/.config/opencode/opencode.jsonc already exists (use --force to overwrite, or --merge to merge JSON without conflicts)",
+				};
+			}
 		}
 
 		if (!dryrun) {
@@ -337,13 +438,14 @@ function installAll(
 	dryrun = false,
 	force = false,
 	from?: string,
+	merge = false,
 ): InstallResult[] {
 	return [
-		installHelix(dryrun, force, from),
-		installTmux(dryrun, force, from),
-		installBashrc(dryrun, force, from),
-		installZed(dryrun, force, from),
-		installOpencode(dryrun, force, from),
+		installHelix(dryrun, force, from, merge),
+		installTmux(dryrun, force, from, merge),
+		installBashrc(dryrun, force, from, merge),
+		installZed(dryrun, force, from, merge),
+		installOpencode(dryrun, force, from, merge),
 	];
 }
 
@@ -452,6 +554,10 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
+	.option(
+		"-m, --merge",
+		"Merge JSON files if they already exist (without overwriting conflicting keys)",
+	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -461,6 +567,7 @@ installCommand
 	.action((options) => {
 		const dryrun = options.dryrun || false;
 		const force = options.force || false;
+		const merge = options.merge || false;
 		const verify = options.verify !== false;
 		const showDiff = options.diff || false;
 		const from = options.from;
@@ -469,7 +576,7 @@ installCommand
 			`Installing all configurations from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: installAll(dryrun, force, from),
+			results: installAll(dryrun, force, from, merge),
 			dryrun,
 			verify,
 			showDiff,
@@ -485,6 +592,10 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
+	.option(
+		"-m, --merge",
+		"Merge JSON files if they already exist (without overwriting conflicting keys)",
+	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -497,6 +608,7 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
+		const merge = options.merge || parentOptions.merge || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
 		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
@@ -505,7 +617,7 @@ installCommand
 			`Installing all configurations from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: installAll(dryrun, force, from),
+			results: installAll(dryrun, force, from, merge),
 			dryrun,
 			verify,
 			showDiff,
@@ -522,6 +634,10 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
+	.option(
+		"-m, --merge",
+		"Merge JSON files if they already exist (without overwriting conflicting keys)",
+	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -534,6 +650,7 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
+		const merge = options.merge || parentOptions.merge || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
 		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
@@ -542,7 +659,7 @@ installCommand
 			`Installing Helix configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: [installHelix(dryrun, force, from)],
+			results: [installHelix(dryrun, force, from, merge)],
 			dryrun,
 			verify,
 			showDiff,
@@ -558,6 +675,10 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
+	.option(
+		"-m, --merge",
+		"Merge JSON files if they already exist (without overwriting conflicting keys)",
+	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -570,6 +691,7 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
+		const merge = options.merge || parentOptions.merge || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
 		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
@@ -578,7 +700,7 @@ installCommand
 			`Installing tmux configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: [installTmux(dryrun, force, from)],
+			results: [installTmux(dryrun, force, from, merge)],
 			dryrun,
 			verify,
 			showDiff,
@@ -595,6 +717,10 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
+	.option(
+		"-m, --merge",
+		"Merge JSON files if they already exist (without overwriting conflicting keys)",
+	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -607,6 +733,7 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
+		const merge = options.merge || parentOptions.merge || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
 		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
@@ -615,7 +742,7 @@ installCommand
 			`Installing bashrc configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: [installBashrc(dryrun, force, from)],
+			results: [installBashrc(dryrun, force, from, merge)],
 			dryrun,
 			verify,
 			showDiff,
@@ -631,6 +758,10 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
+	.option(
+		"-m, --merge",
+		"Merge JSON files if they already exist (without overwriting conflicting keys)",
+	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -643,6 +774,7 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
+		const merge = options.merge || parentOptions.merge || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
 		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
@@ -651,7 +783,7 @@ installCommand
 			`Installing Zed configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: [installZed(dryrun, force, from)],
+			results: [installZed(dryrun, force, from, merge)],
 			dryrun,
 			verify,
 			showDiff,
@@ -667,6 +799,10 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
+	.option(
+		"-m, --merge",
+		"Merge JSON files if they already exist (without overwriting conflicting keys)",
+	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -679,6 +815,7 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
+		const merge = options.merge || parentOptions.merge || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
 		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
@@ -687,7 +824,7 @@ installCommand
 			`Installing opencode configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: [installOpencode(dryrun, force, from)],
+			results: [installOpencode(dryrun, force, from, merge)],
 			dryrun,
 			verify,
 			showDiff,

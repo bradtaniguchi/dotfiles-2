@@ -13,7 +13,7 @@
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"format": "biome format --write .",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "node --experimental-strip-types tests/json-helper.test.ts"
 	},
 	"keywords": [
 		"dotfiles",
