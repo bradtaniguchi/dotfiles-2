@@ -2,6 +2,7 @@
  * Strips comments (block and single line) and trailing commas from a JSONC string
  * and parses it into a JS object.
  */
+// biome-ignore lint/suspicious/noExplicitAny: JSON parsing returns any
 export function parseJsonc(content: string): any {
 	// Strip block comments /* ... */
 	let cleaned = content.replace(/\/\*[\s\S]*?\*\//g, "");
@@ -44,7 +45,9 @@ export function parseJsonc(content: string): any {
  * Returns the path of conflict (e.g. "editor.tab_size") or null if they can be merged.
  */
 export function findJsonConflict(
+	// biome-ignore lint/suspicious/noExplicitAny: JSON structure can be any shape
 	source: any,
+	// biome-ignore lint/suspicious/noExplicitAny: JSON structure can be any shape
 	dest: any,
 	path = "",
 ): string | null {
@@ -77,7 +80,13 @@ export function findJsonConflict(
  * Merges source JSON object into dest JSON object recursively.
  * Assumes findJsonConflict has returned null.
  */
-export function mergeJson(source: any, dest: any): any {
+export function mergeJson(
+	// biome-ignore lint/suspicious/noExplicitAny: JSON structure can be any shape
+	source: any,
+	// biome-ignore lint/suspicious/noExplicitAny: JSON structure can be any shape
+	dest: any,
+	// biome-ignore lint/suspicious/noExplicitAny: JSON structure can be any shape
+): any {
 	if (
 		typeof source === "object" &&
 		source !== null &&

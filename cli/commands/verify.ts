@@ -448,4 +448,10 @@ verifyCommand
 	});
 
 // Export verification functions for use in other commands
-export { verifyHelixConfig, verifyTmuxConfig, verifyBashrc, verifyZedConfig, verifyOpencodeConfig };
+export {
+	verifyHelixConfig,
+	verifyTmuxConfig,
+	verifyBashrc,
+	verifyZedConfig,
+	verifyOpencodeConfig,
+};

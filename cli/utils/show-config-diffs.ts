@@ -1,7 +1,7 @@
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { compareFiles, compareDirectories } from "./diff.ts";
+import { compareDirectories, compareFiles } from "./diff.ts";
 import { displayDiff } from "./diff-renderer.ts";
 
 const __filename = fileURLToPath(import.meta.url);
