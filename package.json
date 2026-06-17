@@ -21,7 +21,7 @@
 		"configuration"
 	],
 	"author": "",
-	"license": "ISC",
+	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.14",
 		"@types/diff": "^7.0.2",
