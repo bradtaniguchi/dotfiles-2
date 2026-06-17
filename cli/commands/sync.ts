@@ -216,7 +216,13 @@ function syncOpencode(dryrun = false): SyncResult {
 }
 
 function syncAll(dryrun = false): SyncResult[] {
-	return [syncHelix(dryrun), syncTmux(dryrun), syncBashrc(dryrun), syncZed(dryrun), syncOpencode(dryrun)];
+	return [
+		syncHelix(dryrun),
+		syncTmux(dryrun),
+		syncBashrc(dryrun),
+		syncZed(dryrun),
+		syncOpencode(dryrun),
+	];
 }
 
 interface DisplayResultsOptions {
@@ -224,7 +230,10 @@ interface DisplayResultsOptions {
 	dryrun?: boolean;
 }
 
-function displayResults({ results, dryrun = false }: DisplayResultsOptions): void {
+function displayResults({
+	results,
+	dryrun = false,
+}: DisplayResultsOptions): void {
 	let allSucceeded = true;
 
 	for (const result of results) {

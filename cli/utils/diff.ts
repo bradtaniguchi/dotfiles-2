@@ -1,6 +1,6 @@
-import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { diffLines, type Change } from "diff";
+import { type Change, diffLines } from "diff";
 
 export interface FileDiff {
 	path: string;
