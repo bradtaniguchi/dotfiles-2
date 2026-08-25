@@ -85,7 +85,6 @@ function installHelix(
 	dryrun = false,
 	force = false,
 	from?: string,
-	_merge = false,
 ): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
@@ -136,7 +135,6 @@ function installTmux(
 	dryrun = false,
 	force = false,
 	from?: string,
-	_merge = false,
 ): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
@@ -192,7 +190,6 @@ function installBashrc(
 	dryrun = false,
 	force = false,
 	from?: string,
-	_merge = false,
 ): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
@@ -439,7 +436,6 @@ function installHerdr(
 	dryrun = false,
 	force = false,
 	from?: string,
-	_merge = false,
 ): InstallResult {
 	try {
 		const repoRoot = join(__dirname, "../..");
@@ -498,12 +494,12 @@ function installAll(
 	merge = false,
 ): InstallResult[] {
 	return [
-		installHelix(dryrun, force, from, merge),
-		installTmux(dryrun, force, from, merge),
-		installBashrc(dryrun, force, from, merge),
+		installHelix(dryrun, force, from),
+		installTmux(dryrun, force, from),
+		installBashrc(dryrun, force, from),
 		installZed(dryrun, force, from, merge),
 		installOpencode(dryrun, force, from, merge),
-		installHerdr(dryrun, force, from, merge),
+		installHerdr(dryrun, force, from),
 	];
 }
 
@@ -695,10 +691,6 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
-	.option(
-		"-m, --merge",
-		"Merge JSON files if they already exist (without overwriting conflicting keys)",
-	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -711,7 +703,6 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
-		const merge = options.merge || parentOptions.merge || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
 		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
@@ -720,7 +711,7 @@ installCommand
 			`Installing Helix configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: [installHelix(dryrun, force, from, merge)],
+			results: [installHelix(dryrun, force, from)],
 			dryrun,
 			verify,
 			showDiff,
@@ -736,10 +727,6 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
-	.option(
-		"-m, --merge",
-		"Merge JSON files if they already exist (without overwriting conflicting keys)",
-	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -752,7 +739,6 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
-		const merge = options.merge || parentOptions.merge || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
 		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
@@ -761,7 +747,7 @@ installCommand
 			`Installing tmux configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: [installTmux(dryrun, force, from, merge)],
+			results: [installTmux(dryrun, force, from)],
 			dryrun,
 			verify,
 			showDiff,
@@ -778,10 +764,6 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
-	.option(
-		"-m, --merge",
-		"Merge JSON files if they already exist (without overwriting conflicting keys)",
-	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -794,7 +776,6 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
-		const merge = options.merge || parentOptions.merge || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
 		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
@@ -803,7 +784,7 @@ installCommand
 			`Installing bashrc configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: [installBashrc(dryrun, force, from, merge)],
+			results: [installBashrc(dryrun, force, from)],
 			dryrun,
 			verify,
 			showDiff,
@@ -901,10 +882,6 @@ installCommand
 		"Show what would be installed without actually installing",
 	)
 	.option("-f, --force", "Force overwrite existing files")
-	.option(
-		"-m, --merge",
-		"Merge JSON files if they already exist (without overwriting conflicting keys)",
-	)
 	.option("--no-verify", "Skip verification after installation")
 	.option("--diff", "Show differences before installation")
 	.option(
@@ -917,7 +894,6 @@ installCommand
 		const parentOptions = cmd.parent?.opts() || {};
 		const dryrun = options.dryrun || parentOptions.dryrun || false;
 		const force = options.force || parentOptions.force || false;
-		const merge = options.merge || parentOptions.merge || false;
 		const verify = options.verify !== false && parentOptions.verify !== false;
 		const showDiff = options.diff || parentOptions.diff || false;
 		const from = options.from || parentOptions.from;
@@ -926,7 +902,7 @@ installCommand
 			`Installing herdr configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({
-			results: [installHerdr(dryrun, force, from, merge)],
+			results: [installHerdr(dryrun, force, from)],
 			dryrun,
 			verify,
 			showDiff,
