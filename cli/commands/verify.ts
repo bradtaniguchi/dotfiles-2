@@ -157,6 +157,23 @@ function verifyOpencodeConfig(): VerifyResult {
 	};
 }
 
+function verifyHerdrConfig(): VerifyResult {
+	const herdrPath = join(homedir(), ".config", "herdr", "config.toml");
+
+	if (!existsSync(herdrPath)) {
+		return {
+			name: "herdr",
+			installed: false,
+			message: "~/.config/herdr/config.toml not found",
+		};
+	}
+
+	return {
+		name: "herdr",
+		installed: true,
+	};
+}
+
 function verifyHelixConfig(): VerifyResult {
 	const helixConfigPath = join(homedir(), ".config", "helix");
 
@@ -229,6 +246,7 @@ function verifyAll(): VerifyResult[] {
 		verifyBashrc(),
 		verifyZedConfig(),
 		verifyOpencodeConfig(),
+		verifyHerdrConfig(),
 		verifyGh(),
 		verifyHtop(),
 	];
@@ -447,6 +465,15 @@ verifyCommand
 		displayResults({ results: [verifyOpencodeConfig()] });
 	});
 
+// Subcommand: verify herdr
+verifyCommand
+	.command("herdr")
+	.description("Verify herdr configuration")
+	.action(() => {
+		console.log("Verifying herdr configuration...\n");
+		displayResults({ results: [verifyHerdrConfig()] });
+	});
+
 // Export verification functions for use in other commands
 export {
 	verifyHelixConfig,
@@ -454,4 +481,5 @@ export {
 	verifyBashrc,
 	verifyZedConfig,
 	verifyOpencodeConfig,
+	verifyHerdrConfig,
 };

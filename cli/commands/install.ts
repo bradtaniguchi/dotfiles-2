@@ -20,6 +20,7 @@ import {
 	type VerifyResult,
 	verifyBashrc,
 	verifyHelixConfig,
+	verifyHerdrConfig,
 	verifyOpencodeConfig,
 	verifyTmuxConfig,
 	verifyZedConfig,
@@ -434,6 +435,62 @@ function installOpencode(
 	}
 }
 
+function installHerdr(
+	dryrun = false,
+	force = false,
+	from?: string,
+	_merge = false,
+): InstallResult {
+	try {
+		const repoRoot = join(__dirname, "../..");
+		const sourceBase = from
+			? join(repoRoot, "backups", from)
+			: join(repoRoot, "configs");
+		const source = join(sourceBase, "herdr/config.toml");
+		const dest = join(homedir(), ".config", "herdr", "config.toml");
+
+		if (!existsSync(source)) {
+			return {
+				name: "herdr",
+				success: false,
+				message: from
+					? `backups/${from}/herdr/config.toml not found`
+					: "configs/herdr/config.toml not found in repo",
+			};
+		}
+
+		if (!force && existsSync(dest)) {
+			return {
+				name: "herdr",
+				success: true,
+				skipped: true,
+				message:
+					"~/.config/herdr/config.toml already exists (use --force to overwrite)",
+			};
+		}
+
+		if (!dryrun) {
+			const parentDir = dirname(dest);
+			if (!existsSync(parentDir)) {
+				mkdirSync(parentDir, { recursive: true });
+			}
+			copyFileSync(source, dest);
+		}
+
+		return {
+			name: "herdr",
+			success: true,
+			message: dryrun ? `Would install: ${source} → ${dest}` : undefined,
+		};
+	} catch (error) {
+		return {
+			name: "herdr",
+			success: false,
+			message: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
 function installAll(
 	dryrun = false,
 	force = false,
@@ -446,6 +503,7 @@ function installAll(
 		installBashrc(dryrun, force, from, merge),
 		installZed(dryrun, force, from, merge),
 		installOpencode(dryrun, force, from, merge),
+		installHerdr(dryrun, force, from, merge),
 	];
 }
 
@@ -468,6 +526,9 @@ function getVerifyResults(items: string[]): VerifyResult[] {
 				break;
 			case "opencode":
 				results.push(verifyOpencodeConfig());
+				break;
+			case "herdr":
+				results.push(verifyHerdrConfig());
 				break;
 		}
 	}
@@ -825,6 +886,47 @@ installCommand
 		);
 		displayResults({
 			results: [installOpencode(dryrun, force, from, merge)],
+			dryrun,
+			verify,
+			showDiff,
+		});
+	});
+
+// Subcommand: install herdr
+installCommand
+	.command("herdr")
+	.description("Install herdr configuration")
+	.option(
+		"-d, --dryrun",
+		"Show what would be installed without actually installing",
+	)
+	.option("-f, --force", "Force overwrite existing files")
+	.option(
+		"-m, --merge",
+		"Merge JSON files if they already exist (without overwriting conflicting keys)",
+	)
+	.option("--no-verify", "Skip verification after installation")
+	.option("--diff", "Show differences before installation")
+	.option(
+		"--from <backup>",
+		"Install from a specific backup (e.g., 2024-01-15)",
+	)
+	.action((...args) => {
+		const cmd = args[args.length - 1];
+		const options = cmd.opts();
+		const parentOptions = cmd.parent?.opts() || {};
+		const dryrun = options.dryrun || parentOptions.dryrun || false;
+		const force = options.force || parentOptions.force || false;
+		const merge = options.merge || parentOptions.merge || false;
+		const verify = options.verify !== false && parentOptions.verify !== false;
+		const showDiff = options.diff || parentOptions.diff || false;
+		const from = options.from || parentOptions.from;
+		const sourceDesc = from ? `backup (${from})` : "repo";
+		console.log(
+			`Installing herdr configuration from ${sourceDesc} to system${dryrun ? " (dry run)" : ""}...\n`,
+		);
+		displayResults({
+			results: [installHerdr(dryrun, force, from, merge)],
 			dryrun,
 			verify,
 			showDiff,

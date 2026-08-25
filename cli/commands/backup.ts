@@ -65,6 +65,15 @@ function getOpencodeBackupItem(backupDir: string): BackupItem {
 	};
 }
 
+function getHerdrBackupItem(backupDir: string): BackupItem {
+	return {
+		source: join(homedir(), ".config", "herdr", "config.toml"),
+		destination: join(backupDir, "herdr", "config.toml"),
+		type: "file",
+		name: "herdr",
+	};
+}
+
 function getBackupItems(backupDir: string): BackupItem[] {
 	return [
 		getHelixBackupItem(backupDir),
@@ -72,6 +81,7 @@ function getBackupItems(backupDir: string): BackupItem[] {
 		getBashrcBackupItem(backupDir),
 		getZedBackupItem(backupDir),
 		getOpencodeBackupItem(backupDir),
+		getHerdrBackupItem(backupDir),
 	];
 }
 
@@ -311,6 +321,25 @@ backupCommand
 		mkdirSync(backupDir, { recursive: true });
 
 		const items = [getOpencodeBackupItem(backupDir)];
+		const results = performBackup(items);
+		displayBackupResults(results, `backups/${dateStr}`);
+	});
+
+// Subcommand: backup herdr
+backupCommand
+	.command("herdr")
+	.description("Backup herdr configuration")
+	.action(() => {
+		console.log("Creating herdr backup...\n");
+
+		const today = new Date();
+		const dateStr = today.toISOString().split("T")[0];
+		const repoRoot = join(__dirname, "../..");
+		const backupDir = join(repoRoot, "backups", dateStr);
+
+		mkdirSync(backupDir, { recursive: true });
+
+		const items = [getHerdrBackupItem(backupDir)];
 		const results = performBackup(items);
 		displayBackupResults(results, `backups/${dateStr}`);
 	});
