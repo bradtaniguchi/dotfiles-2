@@ -215,6 +215,42 @@ function syncOpencode(dryrun = false): SyncResult {
 	}
 }
 
+function syncHerdr(dryrun = false): SyncResult {
+	try {
+		const repoRoot = join(__dirname, "../..");
+		const source = join(homedir(), ".config", "herdr", "config.toml");
+		const dest = join(repoRoot, "configs/herdr/config.toml");
+
+		if (!existsSync(source)) {
+			return {
+				name: "herdr",
+				success: false,
+				message: "~/.config/herdr/config.toml not found",
+			};
+		}
+
+		if (!dryrun) {
+			const parentDir = dirname(dest);
+			if (!existsSync(parentDir)) {
+				mkdirSync(parentDir, { recursive: true });
+			}
+			copyFileSync(source, dest);
+		}
+
+		return {
+			name: "herdr",
+			success: true,
+			message: dryrun ? `Would sync: ${source} → ${dest}` : undefined,
+		};
+	} catch (error) {
+		return {
+			name: "herdr",
+			success: false,
+			message: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
 function syncAll(dryrun = false): SyncResult[] {
 	return [
 		syncHelix(dryrun),
@@ -222,6 +258,7 @@ function syncAll(dryrun = false): SyncResult[] {
 		syncBashrc(dryrun),
 		syncZed(dryrun),
 		syncOpencode(dryrun),
+		syncHerdr(dryrun),
 	];
 }
 
@@ -366,4 +403,19 @@ syncCommand
 			`Syncing opencode configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
 		);
 		displayResults({ results: [syncOpencode(dryrun)], dryrun });
+	});
+
+// Subcommand: sync herdr
+syncCommand
+	.command("herdr")
+	.description("Sync herdr configuration")
+	.option("-d, --dryrun", "Show what would be synced without actually syncing")
+	.action((_, cmd) => {
+		const options = cmd.opts();
+		const parentOptions = cmd.parent?.opts() || {};
+		const dryrun = options.dryrun || parentOptions.dryrun || false;
+		console.log(
+			`Syncing herdr configuration from system to repo${dryrun ? " (dry run)" : ""}...\n`,
+		);
+		displayResults({ results: [syncHerdr(dryrun)], dryrun });
 	});

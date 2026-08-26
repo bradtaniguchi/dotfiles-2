@@ -56,5 +56,14 @@ export function showConfigDiffs(): void {
 		allDiffs.push(opencodeDiff);
 	}
 
+	// Compare herdr config
+	const herdrDiff = compareFiles(
+		join(__dirname, "../../configs/herdr/config.toml"),
+		join(homedir(), ".config", "herdr", "config.toml"),
+	);
+	if (herdrDiff) {
+		allDiffs.push(herdrDiff);
+	}
+
 	displayDiff(allDiffs);
 }
